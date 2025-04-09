@@ -2,15 +2,18 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HotelManagementApp"
+             xmlns:metro="http://metro.mahapps.com/winfx/xaml"
+
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <!-- Các Resource cho toàn bộ ứng dụng -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Bạn có thể tham chiếu tới các file ResourceDictionary khác tại đây nếu có -->
+                
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Các style chung cho toàn bộ ứng dụng -->
+        
+        
+        <!-- Các style chung cho toàn bộ ứng dụng -->
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Poppins"/>
                 <Setter Property="FontSize" Value="14"/>

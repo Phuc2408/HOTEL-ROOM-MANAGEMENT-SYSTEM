@@ -50,9 +50,6 @@ namespace HotelManagementApp
                 SearchBox.Foreground = Brushes.Gray;
             }
         }
-
-        // ... other code ...
-
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             if (GuestDataGrid.SelectedItem != null)

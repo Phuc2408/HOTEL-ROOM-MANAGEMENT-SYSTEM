@@ -1,0 +1,31 @@
+﻿<Page x:Class="HotelManagementApp.RoomManagement"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:HotelManagementApp"
+      Title="Room Management"
+      Background="White"
+      FontFamily="Segoe UI">
+
+    <Grid Margin="20">
+        <!-- Modal CheckIn -->
+        <local:CheckInModal x:Name="CheckInPopup" Visibility="Collapsed" Grid.ColumnSpan="2"/>
+
+        <!-- Floor Selector -->
+        <StackPanel Grid.Column="0" Margin="0,0,20,0" VerticalAlignment="Top">
+            <TextBlock Text="Floor" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+            <Button Content="1" Click="FloorButton_Click" Tag="1" Margin="0,4" Width="40" Height="40" Background="MediumPurple" Foreground="White"/>
+            <Button Content="2" Click="FloorButton_Click" Tag="2" Margin="0,4" Width="40" Height="40" Background="MediumPurple" Foreground="White"/>
+            <Button Content="3" Click="FloorButton_Click" Tag="3" Margin="0,4" Width="40" Height="40" Background="MediumPurple" Foreground="White"/>
+            <Button Content="4" Click="FloorButton_Click" Tag="4" Margin="0,4" Width="40" Height="40" Background="MediumPurple" Foreground="White"/>
+            <Button Content="5" Click="FloorButton_Click" Tag="5" Margin="0,4" Width="40" Height="40" Background="MediumPurple" Foreground="White"/>
+        </StackPanel>
+
+        <ItemsControl x:Name="RoomWrapPanel">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</Page>
