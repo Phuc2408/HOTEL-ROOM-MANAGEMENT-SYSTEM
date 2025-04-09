@@ -1,23 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using HotelManagementApp;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows;
 
 namespace HotelManagementApp
 {
-    /// <summary>
-    /// Interaction logic for GuestManagement.xaml
-    /// </summary>
     public partial class GuestManagement : Page
     {
         public class Guest
@@ -31,18 +18,21 @@ namespace HotelManagementApp
             public Brush? StatusColor { get; set; }
         }
 
+        // Declare the Guests list at the class level
+        public List<Guest> Guests { get; set; }
+
         public GuestManagement()
         {
-            InitializeComponent();
-
-            var demoData = new List<Guest>
+            InitializeComponent(); // Ensure this method is defined in the generated partial class
+            Guests = new List<Guest>
         {
             new Guest { Name = "Jane Cooper", IDCard = "KA0963", PhoneNumber = "(225) 555-0118", Email = "jane@microsoft.com", Country = "USA", Room = "Room 101", StatusColor = Brushes.Green },
             new Guest { Name = "Floyd Miles", IDCard = "K09637", PhoneNumber = "(205) 555-0100", Email = "floyd@yahoo.com", Country = "Kiribati", Room = "Room 201", StatusColor = Brushes.Red }
         };
-
-            GuestDataGrid.ItemsSource = demoData;
+            GuestDataGrid.ItemsSource = Guests;
         }
+
+        // Handle SearchBox focus events
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (SearchBox.Text == "Search")
@@ -61,5 +51,61 @@ namespace HotelManagementApp
             }
         }
 
+        // ... other code ...
+
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (GuestDataGrid.SelectedItem != null)
+            {
+                var selectedGuest = (Guest)GuestDataGrid.SelectedItem;
+                EditGuest editPage = new EditGuest(selectedGuest);
+
+                // Use the Navigated event of the NavigationService
+                this.NavigationService.Navigated += (s, args) =>
+                {
+                    // Refresh the data after edit
+                    GuestDataGrid.Items.Refresh();
+                };
+
+                this.NavigationService.Navigate(editPage);
+            }
+            else
+            {
+                MessageBox.Show("Please select a guest to edit.");
+            }
+        }
+
+
+        // Handle Delete Button Click
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (GuestDataGrid.SelectedItem != null)
+            {
+                var selectedGuest = (Guest)GuestDataGrid.SelectedItem;
+
+                // Confirm deletion
+                var result = MessageBox.Show("Are you sure you want to delete this guest?", "Delete", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    // Delete the guest (this should be implemented)
+                    DeleteGuest(selectedGuest);
+
+                    // Update the DataGrid after deletion
+                    var updatedGuests = Guests.Where(g => g != selectedGuest).ToList();
+                    GuestDataGrid.ItemsSource = updatedGuests;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a guest to delete.");
+            }
+        }
+
+        // Delete a guest (implement this method to remove the guest from the data source)
+        private void DeleteGuest(Guest guest)
+        {
+            // Remove the guest from the in-memory list
+            Guests.Remove(guest);
+        }
     }
 }

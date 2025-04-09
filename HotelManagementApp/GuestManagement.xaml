@@ -15,143 +15,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid.Resources>
-            <Style TargetType="TextBlock">
-                <Setter Property="FontFamily" Value="Poppins"/>
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="TextAlignment" Value="Left"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="Margin" Value="0,1,0,0"/>
-            </Style>
-
-            <!-- Custom Icon Button -->
-            <Style x:Key="IconButtonStyle" TargetType="Button">
-                <Setter Property="Margin" Value="5,5,5,5"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                             <Border Background="{TemplateBinding Background}" CornerRadius="8" ToolTip="{TemplateBinding ToolTip}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <!-- Rounded TextBox Style -->
-            <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
-                <Setter Property="Padding" Value="10,4"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-            </Style>
-
-            <!-- Rounded ComboBox Style -->
-            <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox">
-                <Setter Property="Background" Value="#E5E7EB"/>
-                <Setter Property="BorderBrush" Value="#E5E7EB"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="Padding" Value="8,4"/>
-                <Setter Property="Height" Value="32"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ComboBox">
-                            <Border CornerRadius="12"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}">
-                                <Grid>
-                                    <ToggleButton IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                                  Background="Transparent"
-                                                  BorderThickness="0"
-                                                  Focusable="False"
-                                                  ClickMode="Press"
-                                                  HorizontalAlignment="Stretch"
-                                                  VerticalAlignment="Stretch">
-                                        <ContentPresenter Margin="8,0,24,0"
-                                                          VerticalAlignment="Center"
-                                                          HorizontalAlignment="Left"
-                                                          Content="{TemplateBinding SelectionBoxItem}"
-                                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
-                                    </ToggleButton>
-                                    <Path Margin="0,0,8,0"
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Right"
-                                          Fill="Gray"
-                                          Data="M 0 0 L 4 4 L 8 0 Z"/>
-                                </Grid>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <!-- DataGrid style -->
-            <Style TargetType="DataGrid">
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="BorderBrush" Value="Transparent"/>
-                <Setter Property="RowBackground" Value="White"/>
-                <Setter Property="AlternatingRowBackground" Value="White"/>
-                <Setter Property="FontFamily" Value="Poppins"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="FontWeight" Value="Normal"/>
-                <Setter Property="GridLinesVisibility" Value="Horizontal"/>
-                <Setter Property="HorizontalGridLinesBrush" Value="#E5E7EB"/>
-                <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
-                <Setter Property="RowHeight" Value="36"/>
-                <Setter Property="HeadersVisibility" Value="Column"/>
-            </Style>
-
-            <Style TargetType="DataGridCell">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="Normal"/>
-                <Setter Property="Padding" Value="8,4"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-            </Style>
-
-            <Style TargetType="DataGridColumnHeader">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="Padding" Value="8,4"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Background" Value="#F3F4F6"/>
-                <Setter Property="BorderBrush" Value="#E5E7EB"/>
-                <Setter Property="Foreground" Value="#374151"/>
-            </Style>
-
-            <!-- Pagination Button Style -->
-            <Style x:Key="PaginationButtonStyle" TargetType="Button">
-                <Setter Property="Width" Value="32"/>
-                <Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="4"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="FontWeight" Value="Normal"/>
-                <Setter Property="Background" Value="White"/>
-                <Setter Property="BorderBrush" Value="#D1D5DB"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}" 
-                                    BorderThickness="{TemplateBinding BorderThickness}" 
-                                    CornerRadius="6">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </Grid.Resources>
-
         <!-- Title -->
         <TextBlock Grid.Row="1" Text="Guest Management" FontSize="22" FontWeight="Bold" Foreground="#2D3748" Margin="0,0,0,10"/>
 
@@ -175,13 +38,10 @@
                 </ComboBox>
 
                 <!-- Buttons -->
-                <Button Style="{StaticResource IconButtonStyle}" ToolTip="Add Guest">
-                    <TextBlock Text="➕"/>
-                </Button>
-                <Button Style="{StaticResource IconButtonStyle}" ToolTip="Edit Guest">
+                <Button Style="{StaticResource IconButtonStyle}" ToolTip="Edit Guest" Click="EditButton_Click">
                     <TextBlock Text="✏️"/>
                 </Button>
-                <Button Style="{StaticResource IconButtonStyle}" ToolTip="Delete Guest">
+                <Button Style="{StaticResource IconButtonStyle}" ToolTip="Delete Guest" Click="DeleteButton_Click">
                     <TextBlock Text="🗑"/>
                 </Button>
             </StackPanel>

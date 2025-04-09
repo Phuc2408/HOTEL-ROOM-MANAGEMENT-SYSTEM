@@ -15,6 +15,7 @@
         </Style>
     </Window.Resources>
     <Grid>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="*"/>
@@ -130,6 +131,7 @@
             <Frame x:Name="MainContentFrame"
                      Grid.Row="1"
                      NavigationUIVisibility="Hidden"/>
+            <Frame Name="MainFrame" NavigationUIVisibility="Hidden"/>
 
             <!-- Topbar-->
             <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
@@ -151,8 +153,6 @@
                                        VerticalAlignment="Center"/>
                         </Grid>
                         <TextBlock Text="Admin" Margin="10,0" VerticalAlignment="Center" Foreground="#2D3748"/>
-                        <TextBlock Text="▼" Margin="5,0" VerticalAlignment="Center" Foreground="#A0AEC0"/>
-                        <TextBlock Text="🔔" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#ED4E4E"/>
                     </StackPanel>
                 </Grid>
             </Border>
