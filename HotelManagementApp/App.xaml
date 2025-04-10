@@ -8,12 +8,8 @@
     <Application.Resources>
         <!-- Các Resource cho toàn bộ ứng dụng -->
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                
-            </ResourceDictionary.MergedDictionaries>
-        
-        
-        <!-- Các style chung cho toàn bộ ứng dụng -->
+            
+            <!-- Các style chung cho toàn bộ ứng dụng -->
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Poppins"/>
                 <Setter Property="FontSize" Value="14"/>
@@ -36,53 +32,111 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="SquareIconButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="32"/>
+                <Setter Property="Height" Value="32"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                        CornerRadius="6"  
+                                SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
             <!-- Rounded TextBox Style -->
             <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
                 <Setter Property="Padding" Value="10,4"/>
                 <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="FontFamily" Value="Poppins"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
             </Style>
             
             <!-- Rounded ComboBox Style -->
-            <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox">
+            <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox"
+       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+                <Setter Property="FontFamily" Value="Poppins"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="#1F2937"/>
+                <Setter Property="Height" Value="32"/>
+                <Setter Property="Padding" Value="12,4,40,4"/>
                 <Setter Property="Background" Value="#E5E7EB"/>
                 <Setter Property="BorderBrush" Value="#E5E7EB"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="Padding" Value="8,4"/>
-                <Setter Property="Height" Value="32"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ComboBox">
-                            <Border CornerRadius="12"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}">
-                                <Grid>
-                                    <ToggleButton IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                      Background="Transparent"
-                                      BorderThickness="0"
-                                      Focusable="False"
-                                      ClickMode="Press"
-                                      HorizontalAlignment="Stretch"
-                                      VerticalAlignment="Stretch">
-                                        <ContentPresenter Margin="8,0,24,0"
+                            <Grid>
+                                <!-- Vùng bo góc toàn bộ combo -->
+                                <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="11">
+                                    <Grid>
+                                        <!-- Nội dung đã chọn -->
+                                        <ContentPresenter Margin="{TemplateBinding Padding}"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Left"
-                                              Content="{TemplateBinding SelectionBoxItem}"
-                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
-                                    </ToggleButton>
-                                    <Path Margin="0,0,8,0"
-                              VerticalAlignment="Center"
-                              HorizontalAlignment="Right"
-                              Fill="Gray"
-                              Data="M 0 0 L 4 4 L 8 0 Z"/>
-                                </Grid>
-                            </Border>
+                                              Content="{TemplateBinding SelectionBoxItem}" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Icon Sort + nút toggle hoạt động -->
+                                <ToggleButton HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  Width="32"
+                                  Height="32"
+                                  Margin="0,0,6,0"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                  ClickMode="Press"
+                                  Focusable="False">
+                                    <iconPacks:PackIconMaterial Kind="Sort"
+                                                    Width="16"
+                                                    Height="16"
+                                                    Foreground="Gray"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"/>
+                                </ToggleButton>
+
+                                <!-- Dropdown menu -->
+                                <Popup Name="Popup"
+                           Placement="Bottom"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           AllowsTransparency="True"
+                           Focusable="False"
+                           PopupAnimation="Slide">
+                                    <Border Background="White"
+                                CornerRadius="5"
+                                Margin="0,4,0,0"
+                                BorderThickness="0"
+                                            Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ComboBox}}">
+
+                                        <StackPanel IsItemsHost="True"
+                                        KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
@@ -100,29 +154,30 @@
                 <Setter Property="GridLinesVisibility" Value="Horizontal"/>
                 <Setter Property="HorizontalGridLinesBrush" Value="#E5E7EB"/>
                 <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
-                <Setter Property="RowHeight" Value="36"/>
+                <Setter Property="RowHeight" Value="30"/>
                 <Setter Property="HeadersVisibility" Value="Column"/>
             </Style>
 
-            <Style TargetType="DataGridCell">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="Normal"/>
-                <Setter Property="Padding" Value="8,4"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-            </Style>
+                <!-- Style Header -->
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#F8F9FA"/>
+                    <Setter Property="Padding" Value="0,8"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    <Setter Property="BorderBrush" Value="#E1E1E1"/>
+                    <Setter Property="FontFamily" Value="Poppins"/>
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                </Style>
 
-            <Style TargetType="DataGridColumnHeader">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="Padding" Value="8,4"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Background" Value="#F3F4F6"/>
-                <Setter Property="BorderBrush" Value="#E5E7EB"/>
-                <Setter Property="Foreground" Value="#374151"/>
-            </Style>
+                <!-- Style Cell -->
+                <Style TargetType="DataGridCell">
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    <Setter Property="Padding" Value="10,8"/>
+                    <Setter Property="FontFamily" Value="Poppins"/>
+                    <Setter Property="FontSize" Value="13"/>
+                </Style>
 
             <!-- Pagination Button Style -->
             <Style x:Key="PaginationButtonStyle" TargetType="Button">

@@ -22,7 +22,7 @@ namespace HotelManagementApp
             Name.Text = _guestToEdit.Name;
             Phone.Text = _guestToEdit.PhoneNumber;
             Email.Text = _guestToEdit.Email;
-            Country.Text = _guestToEdit.Country;
+            CheckInDate.Text = _guestToEdit.CheckInDate.ToString("MM/dd/yyyy"); // Convert DateTime to string
             Status.Text = _guestToEdit.Room;
         }
 
@@ -32,7 +32,15 @@ namespace HotelManagementApp
             _guestToEdit.Name = Name.Text;
             _guestToEdit.PhoneNumber = Phone.Text;
             _guestToEdit.Email = Email.Text;
-            _guestToEdit.Country = Country.Text;
+            if (DateTime.TryParse(CheckInDate.Text, out DateTime checkInDate))
+            {
+                _guestToEdit.CheckInDate = checkInDate;
+            }
+            else
+            {
+                MessageBox.Show("Invalid Check-In Date format.");
+                return;
+            }
             _guestToEdit.Room = Status.Text;
 
             // Lưu vào cơ sở dữ liệu hoặc bộ nhớ nếu cần

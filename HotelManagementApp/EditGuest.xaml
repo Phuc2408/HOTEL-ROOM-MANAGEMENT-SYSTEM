@@ -35,7 +35,7 @@
                     <!-- Guest Name -->
                     <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,10">
                         <TextBlock Text="Guest name" FontSize="14" Foreground="#6B7280" Margin="0,0,0,5"/>
-                        <TextBox x:Name="Name" Text="{Binding Name}" Padding="10" BorderBrush="#E5E7EB" BorderThickness="1" Background="#F9FAFB" Foreground="#374151"/>
+                        <TextBox x:Name="Name" Style="{StaticResource RoundedTextBoxStyle}" Text="{Binding Name}" Padding="10" BorderBrush="#E5E7EB" BorderThickness="1" Background="#F9FAFB" Foreground="#374151"/>
                     </StackPanel>
 
                     <!-- ID Card -->
@@ -58,13 +58,13 @@
 
                     <!-- Country -->
                     <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,10,10">
-                        <TextBlock Text="Country" FontSize="14" Foreground="#6B7280" Margin="0,0,0,5"/>
-                        <TextBox x:Name="Country" Text="{Binding Country}" Padding="10" BorderBrush="#E5E7EB" BorderThickness="1" Background="#F9FAFB" Foreground="#374151"/>
+                        <TextBlock Text="Check In Date" FontSize="14" Foreground="#6B7280" Margin="0,0,0,5"/>
+                        <TextBox x:Name="CheckInDate" Text="{Binding CheckInDate}" Padding="10" BorderBrush="#E5E7EB" BorderThickness="1" Background="#F9FAFB" Foreground="#374151"/>
                     </StackPanel>
 
                     <!-- Status -->
                     <StackPanel Grid.Row="2" Grid.Column="1" Margin="10,0,0,10">
-                        <TextBlock Text="Status" FontSize="14" Foreground="#6B7280" Margin="0,0,0,5"/>
+                        <TextBlock Text="Room" FontSize="14" Foreground="#6B7280" Margin="0,0,0,5"/>
                         <TextBox x:Name="Status" Text="{Binding Room}" Padding="10" BorderBrush="#E5E7EB" BorderThickness="1" Background="#F9FAFB" Foreground="#374151"/>
                     </StackPanel>
                 </Grid>
