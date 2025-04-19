@@ -1,0 +1,89 @@
+﻿<Page x:Class="HotelManagementApp.Views.InsertService"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+      xmlns:local="clr-namespace:HotelManagementApp.Views"
+        mc:Ignorable="d"
+        Title="EditService" Height="450" Width="800">
+    <Grid>
+        <Border Background="White" CornerRadius="10" Padding="20" Margin="20" BorderBrush="LightGray" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Title -->
+
+                <Border Background="White" CornerRadius="12" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="Insert Service"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Service Name -->
+                            <TextBox Grid.Row="0" Grid.Column="0"
+                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="Service Name"
+                         Text="{Binding ServiceName, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!-- ID Service -->
+                            <TextBox Grid.Row="0" Grid.Column="1"
+                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="Service ID"
+                         Text="{Binding ServiceId, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!-- Unit -->
+                            <TextBox Grid.Row="1" Grid.Column="0"
+                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="Unit"
+                         Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!-- Unit Price -->
+                            <TextBox Grid.Row="1" Grid.Column="1"
+         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+         materialDesign:HintAssist.Hint="Unit Price"
+         Text="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+
+                        <!-- Submit button -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+                            <Button Content="Create"
+Margin="5" Width="100"
+Background="MediumPurple" Foreground="White"
+Click="CreateButton_Click" />
+                            <Button Content="Cancel"
+Margin="5" Width="100"
+Style="{StaticResource MaterialDesignOutlinedButton}"
+Click="CancelButton_Click" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </Grid>
+
+        </Border>
+
+    </Grid>
+</Page>
