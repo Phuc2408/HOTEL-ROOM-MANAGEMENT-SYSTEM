@@ -1,52 +1,14 @@
-﻿<Window x:Class="HotelManagementApp.MainWindow"
+﻿<Window x:Class="HotelManagementApp.Views.DashBoard"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        Title="Hostella" Height="800" Width="1200">
-    <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="FontFamily" Value="FontAwesome"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Background" Value="#E5E7EB"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Width" Value="32"/>
-            <Setter Property="Height" Value="32"/>
-            <Setter Property="Margin" Value="0,0,8,0"/>
-        </Style>
-        <Style TargetType="ListBoxItem">
-            <Setter Property="Foreground" Value="#4A5568"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Margin" Value="4"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListBoxItem">
-                        <Border x:Name="Bd"
-                            Background="Transparent"
-                            CornerRadius="12"
-                            Margin="4"
-                            Padding="6">
-                            <ContentPresenter VerticalAlignment="Center"
-                                          HorizontalAlignment="Left"
-                                          Margin="10,0"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaterialDesignDeepPurple100}" />
-                                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
-                                <Setter Property="FontWeight" Value="SemiBold"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaterialDesignDeepPurple300}" />
-                                <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Height="800" Width="1500"
+        Title="DashBoard"
+        WindowStartupLocation="CenterScreen" 
+        ResizeMode="CanResize"  
+        WindowStyle="SingleBorderWindow">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
@@ -56,7 +18,7 @@
         <!-- SIDEBAR -->
         <StackPanel Grid.Column="0" Background="#EDE6FB" VerticalAlignment="Stretch">
             <!-- Logo -->
-            <Image Source="Asset/logo.png" Width="120" Height="40" Margin="20,10,20,0"/>
+            <Image Source="\Asset\logo.png" Width="120" Height="40" Margin="20,10,20,0"/>
 
             <!-- Navigation Sections -->
             <ListBox Background="Transparent" BorderThickness="0" Margin="0,10,0,0">
@@ -70,13 +32,13 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border x:Name="Bd"
-                                            Background="Transparent"
-                                            CornerRadius="12"
-                                            Margin="5,2"
-                                            Padding="8">
+                                    Background="Transparent"
+                                    CornerRadius="12"
+                                    Margin="5,2"
+                                    Padding="8">
                                         <ContentPresenter VerticalAlignment="Center"
-                                                          HorizontalAlignment="Left"
-                                                          Margin="10,0"/>
+                                                  HorizontalAlignment="Left"
+                                                  Margin="10,0"/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
@@ -158,39 +120,8 @@
 
         <!-- MAIN AREA -->
         <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <!--Frame-->
-            <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden"/>
-
-            <!-- Topbar-->
-            <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Admin Info -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                        <Grid Width="30" Height="30">
-                            <Ellipse Fill="#E9D8FD"/>
-                            <TextBlock Text="A"
-                                       FontWeight="Bold"
-                                       Foreground="#6B46C1"
-                                       FontSize="14"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <TextBlock Text="Admin" Margin="10,0" VerticalAlignment="Center" Foreground="#2D3748"/>
-                        <TextBlock Text="▼" Margin="5,0" VerticalAlignment="Center" Foreground="#A0AEC0"/>
-                        <TextBlock Text="🔔" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#ED4E4E"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+            <!-- Frame to load different Pages -->
+            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
         </Grid>
     </Grid>
 </Window>
