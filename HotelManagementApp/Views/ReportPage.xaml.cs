@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace HotelManagementApp.Views
 {
     /// <summary>
-    /// Interaction logic for DashBoard.xaml
+    /// Interaction logic for ReportPage.xaml
     /// </summary>
-    public partial class DashBoard : Page
+    public partial class ReportPage : Page
     {
-        public DashBoard()
+        public ReportPage()
         {
             InitializeComponent();
         }

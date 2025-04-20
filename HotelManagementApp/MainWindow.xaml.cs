@@ -51,7 +51,7 @@ namespace HotelManagementApp
         // Navigate to Report
         private void NavigateToReport(object sender, MouseButtonEventArgs e)
         {
-            //MainFrame.Navigate(new ReportPage());
+            MainFrame.Navigate(new ReportPage());
         }
     }
 }

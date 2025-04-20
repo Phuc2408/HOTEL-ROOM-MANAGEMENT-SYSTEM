@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace HotelManagementApp.Views
+namespace HotelManagementApp.ViewModels
 {
     /// <summary>
-    /// Interaction logic for DashBoard.xaml
+    /// Interaction logic for ReportViewModel.xaml
     /// </summary>
-    public partial class DashBoard : Page
+    public partial class ReportViewModel : Page
     {
-        public DashBoard()
+        public ReportViewModel()
         {
             InitializeComponent();
         }
