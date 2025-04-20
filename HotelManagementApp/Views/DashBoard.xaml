@@ -23,8 +23,13 @@
         </Grid.ColumnDefinitions>
 
         <!-- Dashboard Title -->
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Dashboard" FontSize="18" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,10"/>
-
+        <TextBlock Grid.Row="0"
+            Text="Dash Board"
+            FontSize="24"
+            FontWeight="Bold"
+            Foreground="#673AB7"
+            Margin="20,10,0,20"
+            VerticalAlignment="Center"/>
         <!-- Cards -->
         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,10">
             <!-- Available Card -->
@@ -146,24 +151,24 @@
             </Border>
 
             <!-- Đồng hồ kim -->
-            <Canvas x:Name="ClockCanvas" Width="200" Height="200" Background="Transparent" HorizontalAlignment="Center">
+            <Canvas x:Name="ClockCanvas"  Width="200" Height="200" Background="Transparent" HorizontalAlignment="Center">
                 <!-- Viền tròn ngoài -->
                 <Ellipse Width="200" Height="200"
              Stroke="Black"
              StrokeThickness="2"
              Fill="Transparent"/>
-                <TextBlock Text="12" Canvas.Left="95" Canvas.Top="10" FontWeight="Bold"/>
-                <TextBlock Text="1"  Canvas.Left="135" Canvas.Top="25" FontWeight="Bold"/>
-                <TextBlock Text="2"  Canvas.Left="165" Canvas.Top="55" FontWeight="Bold"/>
-                <TextBlock Text="3"  Canvas.Left="175" Canvas.Top="95" FontWeight="Bold"/>
-                <TextBlock Text="4"  Canvas.Left="165" Canvas.Top="135" FontWeight="Bold"/>
-                <TextBlock Text="5"  Canvas.Left="135" Canvas.Top="165" FontWeight="Bold"/>
-                <TextBlock Text="6"  Canvas.Left="97" Canvas.Top="175" FontWeight="Bold"/>
-                <TextBlock Text="7"  Canvas.Left="55" Canvas.Top="165" FontWeight="Bold"/>
-                <TextBlock Text="8"  Canvas.Left="25" Canvas.Top="135" FontWeight="Bold"/>
-                <TextBlock Text="9"  Canvas.Left="10" Canvas.Top="95" FontWeight="Bold"/>
-                <TextBlock Text="10" Canvas.Left="25" Canvas.Top="55" FontWeight="Bold"/>
-                <TextBlock Text="11" Canvas.Left="55" Canvas.Top="25" FontWeight="Bold"/>
+                <TextBlock Text="12" Canvas.Left="95" Canvas.Top="10" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="1"  Canvas.Left="135" Canvas.Top="25" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="2"  Canvas.Left="165" Canvas.Top="55" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="3"  Canvas.Left="175" Canvas.Top="95" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="4"  Canvas.Left="165" Canvas.Top="135" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="5"  Canvas.Left="135" Canvas.Top="165" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="6"  Canvas.Left="97" Canvas.Top="175" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="7"  Canvas.Left="55" Canvas.Top="165" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="8"  Canvas.Left="25" Canvas.Top="135" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="9"  Canvas.Left="10" Canvas.Top="95" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="10" Canvas.Left="25" Canvas.Top="55" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="11" Canvas.Left="55" Canvas.Top="25" FontWeight="Bold" FontFamily="Courier New"/>
 
                 <!-- Kim giờ -->
                 <Line X1="100" Y1="100" X2="100" Y2="55" Stroke="#673AB7" StrokeThickness="5">
@@ -194,7 +199,7 @@
             <Border Background="White" CornerRadius="6" Padding="5" Margin="0,10">
                 <Calendar BorderThickness="0"
               FocusVisualStyle="{x:Null}"
-              SelectedDate="{Binding SelectedDate, Mode=TwoWay}"/>
+              SelectedDate="{Binding SelectedDate, Mode=TwoWay}" />
             </Border>
 
         </StackPanel>
