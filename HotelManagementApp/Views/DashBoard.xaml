@@ -138,11 +138,66 @@
                 </StackPanel>
             </StackPanel>
         </Border>
+        <!-- Đồng hồ + lịch hiển thị bên phải -->
+        <StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Margin="10" VerticalAlignment="Top">
+            <!-- Đồng hồ số -->
+            <Border Background="#673AB7" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+                <TextBlock Text=" 09:58:04 PM" FontSize="36" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Width="226"/>
+            </Border>
 
-        <!-- Clock and Calendar -->
-        <StackPanel Grid.Row="2" Grid.Column="1" Margin="10">
-            <Ellipse Width="80" Height="80" Stroke="Black" StrokeThickness="2" HorizontalAlignment="Center" Margin="0,10"/>
-            <Calendar Margin="0,10" SelectedDate="{Binding SelectedDate, Mode=TwoWay}"/>
+            <!-- Đồng hồ kim -->
+            <Canvas x:Name="ClockCanvas" Width="200" Height="200" Background="Transparent" HorizontalAlignment="Center">
+                <!-- Viền tròn ngoài -->
+                <Ellipse Width="200" Height="200"
+             Stroke="Black"
+             StrokeThickness="2"
+             Fill="Transparent"/>
+                <TextBlock Text="12" Canvas.Left="95" Canvas.Top="10" FontWeight="Bold"/>
+                <TextBlock Text="1"  Canvas.Left="135" Canvas.Top="25" FontWeight="Bold"/>
+                <TextBlock Text="2"  Canvas.Left="165" Canvas.Top="55" FontWeight="Bold"/>
+                <TextBlock Text="3"  Canvas.Left="175" Canvas.Top="95" FontWeight="Bold"/>
+                <TextBlock Text="4"  Canvas.Left="165" Canvas.Top="135" FontWeight="Bold"/>
+                <TextBlock Text="5"  Canvas.Left="135" Canvas.Top="165" FontWeight="Bold"/>
+                <TextBlock Text="6"  Canvas.Left="97" Canvas.Top="175" FontWeight="Bold"/>
+                <TextBlock Text="7"  Canvas.Left="55" Canvas.Top="165" FontWeight="Bold"/>
+                <TextBlock Text="8"  Canvas.Left="25" Canvas.Top="135" FontWeight="Bold"/>
+                <TextBlock Text="9"  Canvas.Left="10" Canvas.Top="95" FontWeight="Bold"/>
+                <TextBlock Text="10" Canvas.Left="25" Canvas.Top="55" FontWeight="Bold"/>
+                <TextBlock Text="11" Canvas.Left="55" Canvas.Top="25" FontWeight="Bold"/>
+
+                <!-- Kim giờ -->
+                <Line X1="100" Y1="100" X2="100" Y2="55" Stroke="#673AB7" StrokeThickness="5">
+                    <Line.RenderTransform>
+                        <RotateTransform Angle="{Binding HourAngle}" CenterX="100" CenterY="100"/>
+                    </Line.RenderTransform>
+                </Line>
+
+                <!-- Kim phút -->
+                <Line X1="100" Y1="100" X2="100" Y2="35" Stroke="#673AB7" StrokeThickness="3">
+                    <Line.RenderTransform>
+                        <RotateTransform Angle="{Binding MinuteAngle}" CenterX="100" CenterY="100"/>
+                    </Line.RenderTransform>
+                </Line>
+
+                <!-- Kim giây -->
+                <Line X1="100" Y1="100" X2="100" Y2="25" Stroke="#673AB7" StrokeThickness="2">
+                    <Line.RenderTransform>
+                        <RotateTransform Angle="{Binding SecondAngle}" CenterX="100" CenterY="100"/>
+                    </Line.RenderTransform>
+                </Line>
+
+                <!-- Chấm tâm -->
+                <Ellipse Width="10" Height="10" Fill="#673AB7" Canvas.Left="95" Canvas.Top="95"/>
+            </Canvas>
+
+            <!-- Lịch -->
+            <Border Background="White" CornerRadius="6" Padding="5" Margin="0,10">
+                <Calendar BorderThickness="0"
+              FocusVisualStyle="{x:Null}"
+              SelectedDate="{Binding SelectedDate, Mode=TwoWay}"/>
+            </Border>
+
         </StackPanel>
+
     </Grid>
 </Page>
