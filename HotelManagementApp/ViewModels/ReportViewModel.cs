@@ -14,12 +14,16 @@ namespace HotelManagementApp.ViewModels
     public class ReportViewModel : INotifyPropertyChanged
     {
         public SeriesCollection ChartSeries { get; set; }
+        public SeriesCollection RoomTypeSeries { get; set; }
+
         public string[] Labels { get; set; }
         public Func<double, string> YFormatter { get; set; }
 
         public ICommand ChangeModeCommand { get; }
 
         public SeriesCollection GuestSeries { get; set; }
+        public SeriesCollection ServiceUsageSeries { get; set; }
+
         public string[] GuestLabels { get; set; }
 
         private double _totalRevenue;
@@ -64,6 +68,10 @@ namespace HotelManagementApp.ViewModels
             ChangeModeCommand = new RelayCommand<string>(mode => LoadChart(mode));
             LoadChart("Today");
             LoadMonthlyGuests();
+            LoadServiceUsageChart();
+            LoadRoomTypePieChart();
+
+
         }
 
         private void LoadChart(string mode)
@@ -190,5 +198,76 @@ namespace HotelManagementApp.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        public void LoadServiceUsageChart()
+        {
+            ServiceUsageSeries = new SeriesCollection
+    {
+        new PieSeries
+        {
+            Title = "Ăn sáng",
+            Values = new ChartValues<double> { 40 },
+            DataLabels = true
+        },
+        new PieSeries
+        {
+            Title = "Giặt ủi",
+            Values = new ChartValues<double> { 20 },
+            DataLabels = true
+        },
+        new PieSeries
+        {
+            Title = "Spa",
+            Values = new ChartValues<double> { 15 },
+            DataLabels = true
+        },
+        new PieSeries
+        {
+            Title = "Đưa đón sân bay",
+            Values = new ChartValues<double> { 15 },
+            DataLabels = true
+        },
+        new PieSeries
+        {
+            Title = "Gọi đồ ăn",
+            Values = new ChartValues<double> { 10 },
+            DataLabels = true
+        }
+    };
+
+            OnPropertyChanged(nameof(ServiceUsageSeries));
+        }
+        public void LoadRoomTypePieChart()
+        {
+            RoomTypeSeries = new SeriesCollection
+    {
+        new PieSeries
+        {
+            Title = "Standard",
+            Values = new ChartValues<double> { 45 },
+            DataLabels = true
+        },
+        new PieSeries
+        {
+            Title = "Deluxe",
+            Values = new ChartValues<double> { 30 },
+            DataLabels = true
+        },
+        new PieSeries
+        {
+            Title = "Suite",
+            Values = new ChartValues<double> { 15 },
+            DataLabels = true
+        },
+        new PieSeries
+        {
+            Title = "VIP",
+            Values = new ChartValues<double> { 10 },
+            DataLabels = true
+        }
+    };
+
+            OnPropertyChanged(nameof(RoomTypeSeries));
+        }
+
     }
 }

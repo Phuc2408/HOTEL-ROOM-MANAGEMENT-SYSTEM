@@ -18,7 +18,7 @@
             <!-- Row 0: Tiêu đề -->
             <RowDefinition Height="Auto"/>
             <!-- Row 1: Biểu đồ doanh thu -->
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <!-- Row 2: Biểu đồ số lượng khách -->
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -97,9 +97,31 @@
 
         <!-- Cột phải: chỗ placeholder cho chart khác -->
         <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Top">
-            <Border Background="#F5F5F5" Padding="20" CornerRadius="12">
-                <TextBlock Text="Phần hiển thị biểu đồ tròn hoặc tổng đơn..." />
-            </Border>
+            <TextBlock Text="Service Usage Distribution" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+            <lvc:PieChart Series="{Binding ServiceUsageSeries}" 
+                          InnerRadius="30"
+                          Height="250" 
+                          LegendLocation="Bottom">
+                <lvc:PieChart.DataTooltip>
+                    <lvc:DefaultTooltip SelectionMode="OnlySender"/>
+                </lvc:PieChart.DataTooltip>
+            </lvc:PieChart>
         </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,20,0,0">
+            <TextBlock Text="Room Type Distribution" FontSize="16" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,10"/>
+            <lvc:PieChart Series="{Binding RoomTypeSeries}"
+              Height="220"
+              Width="250"
+              LegendLocation="Bottom"
+              InnerRadius="30"
+              Margin="0,0,0,10">
+                <lvc:PieChart.DataTooltip>
+                    <lvc:DefaultTooltip SelectionMode="OnlySender"/>
+                </lvc:PieChart.DataTooltip>
+            </lvc:PieChart>
+
+        </StackPanel>
+
     </Grid>
 </Page>
