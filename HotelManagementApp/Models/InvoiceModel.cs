@@ -4,7 +4,7 @@ namespace HotelManagementApp.Models
 {
     public class InvoiceModel
     {
-        public string InvoiceID { get; set; }   // Ensure it's only defined once
+        public string InvoiceID { get; set; }   
         public string GuestName { get; set; }
         public string RentID { get; set; }
         public DateTime CheckOutDate { get; set; }
