@@ -1,0 +1,208 @@
+﻿<Page x:Class="HotelManagementApp.Views.DashBoard"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:local="clr-namespace:HotelManagementApp.ViewModels"
+      Title="Dashboard"
+      Background="White">
+
+    <Page.DataContext>
+        <local:DashBoardViewModel />
+    </Page.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Dashboard Title -->
+        <TextBlock Grid.Row="0"
+            Text="Dash Board"
+            FontSize="24"
+            FontWeight="Bold"
+            Foreground="#673AB7"
+            Margin="20,10,0,20"
+            VerticalAlignment="Center"/>
+        <!-- Cards -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,10">
+            <!-- Available Card -->
+            <Border Width="200" Height="100" Background="White" CornerRadius="12" Margin="8" Padding="10"
+                    Effect="{DynamicResource MaterialDesignShadowDepth2}" BorderBrush="LightGray" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Column="0" Fill="MediumSeaGreen" RadiusX="4" RadiusY="4" Width="5" Margin="0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                        <TextBlock Text="Available" FontWeight="Bold" FontSize="14" Foreground="#222"/>
+                        <TextBlock Text="{Binding AvailableRooms}" FontWeight="Bold" FontSize="18" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="2" Width="40" Height="40" Background="#32CD32" CornerRadius="20" Margin="10" VerticalAlignment="Center">
+                        <Viewbox>
+                            <materialDesign:PackIcon Kind="Login" Foreground="White"/>
+                        </Viewbox>
+                    </Border>
+                </Grid>
+            </Border>
+            <!-- Check-in Card -->
+            <Border Width="200" Height="100" Background="White" CornerRadius="12" Margin="8" Padding="10"
+                    Effect="{DynamicResource MaterialDesignShadowDepth2}" BorderBrush="LightGray" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Column="0" Fill="DarkOrange" RadiusX="4" RadiusY="4" Width="5" Margin="0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                        <TextBlock Text="Check-in" FontWeight="Bold" FontSize="14" Foreground="#222"/>
+                        <TextBlock Text="{Binding CheckIn}" FontWeight="Bold" FontSize="18" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="2" Width="40" Height="40" Background="#FFA500" CornerRadius="20" Margin="10" VerticalAlignment="Center">
+                        <Viewbox>
+                            <materialDesign:PackIcon Kind="Login" Foreground="White"/>
+                        </Viewbox>
+                    </Border>
+                </Grid>
+            </Border>
+            <!-- Check-out Card -->
+            <Border Width="200" Height="100" Background="White" CornerRadius="12" Margin="8" Padding="10"
+                    Effect="{DynamicResource MaterialDesignShadowDepth2}" BorderBrush="LightGray" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Column="0" Fill="DarkOrange" RadiusX="4" RadiusY="4" Width="5" Margin="0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                        <TextBlock Text="Check-out" FontWeight="Bold" FontSize="14" Foreground="#222"/>
+                        <TextBlock Text="{Binding CheckOut}" FontWeight="Bold" FontSize="18" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="2" Width="40" Height="40" Background="#FFA500" CornerRadius="20" Margin="10" VerticalAlignment="Center">
+                        <Viewbox>
+                            <materialDesign:PackIcon Kind="Logout" Foreground="White"/>
+                        </Viewbox>
+                    </Border>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- Status Table -->
+        <Border Grid.Row="2" Grid.Column="0" CornerRadius="10" Background="White" Padding="20" Margin="0,10,10,0" Effect="{DynamicResource MaterialDesignShadowDepth2}">
+            <StackPanel>
+                <TextBlock Text="Status" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+                <!-- Room Statuses -->
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Available" Width="100"/>
+                    <TextBlock Text="{Binding AvailableRoomsStatus}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Untidy" Width="100"/>
+                    <TextBlock Text="{Binding UntidyRoomsStatus}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Repair" Width="100"/>
+                    <TextBlock Text="{Binding RepairRoomsStatus}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="In use" Width="100"/>
+                    <TextBlock Text="{Binding InUseRoomsStatus}" FontWeight="Bold"/>
+                </StackPanel>
+
+                <Separator Margin="0,10"/>
+
+                <!-- Room Types -->
+                <TextBlock Text="Room Type Available" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Single" Width="100"/>
+                    <TextBlock Text="{Binding SingleRoomsCount}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Twin" Width="100"/>
+                    <TextBlock Text="{Binding TwinRoomsCount}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Double" Width="100"/>
+                    <TextBlock Text="{Binding DoubleRoomsCount}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="VIP" Width="100"/>
+                    <TextBlock Text="{Binding VIPRoomsCount}" FontWeight="Bold"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <!-- Đồng hồ + lịch hiển thị bên phải -->
+        <StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Margin="10" VerticalAlignment="Top">
+            <!-- Đồng hồ số -->
+            <Border Background="#673AB7" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+                <TextBlock Text=" 09:58:04 PM" FontSize="36" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Width="226"/>
+            </Border>
+
+            <!-- Đồng hồ kim -->
+            <Canvas x:Name="ClockCanvas"  Width="200" Height="200" Background="Transparent" HorizontalAlignment="Center">
+                <!-- Viền tròn ngoài -->
+                <Ellipse Width="200" Height="200"
+             Stroke="Black"
+             StrokeThickness="2"
+             Fill="Transparent"/>
+                <TextBlock Text="12" Canvas.Left="95" Canvas.Top="10" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="1"  Canvas.Left="135" Canvas.Top="25" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="2"  Canvas.Left="165" Canvas.Top="55" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="3"  Canvas.Left="175" Canvas.Top="95" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="4"  Canvas.Left="165" Canvas.Top="135" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="5"  Canvas.Left="135" Canvas.Top="165" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="6"  Canvas.Left="97" Canvas.Top="175" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="7"  Canvas.Left="55" Canvas.Top="165" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="8"  Canvas.Left="25" Canvas.Top="135" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="9"  Canvas.Left="10" Canvas.Top="95" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="10" Canvas.Left="25" Canvas.Top="55" FontWeight="Bold" FontFamily="Courier New"/>
+                <TextBlock Text="11" Canvas.Left="55" Canvas.Top="25" FontWeight="Bold" FontFamily="Courier New"/>
+
+                <!-- Kim giờ -->
+                <Line X1="100" Y1="100" X2="100" Y2="55" Stroke="#673AB7" StrokeThickness="5">
+                    <Line.RenderTransform>
+                        <RotateTransform Angle="{Binding HourAngle}" CenterX="100" CenterY="100"/>
+                    </Line.RenderTransform>
+                </Line>
+
+                <!-- Kim phút -->
+                <Line X1="100" Y1="100" X2="100" Y2="35" Stroke="#673AB7" StrokeThickness="3">
+                    <Line.RenderTransform>
+                        <RotateTransform Angle="{Binding MinuteAngle}" CenterX="100" CenterY="100"/>
+                    </Line.RenderTransform>
+                </Line>
+
+                <!-- Kim giây -->
+                <Line X1="100" Y1="100" X2="100" Y2="25" Stroke="#673AB7" StrokeThickness="2">
+                    <Line.RenderTransform>
+                        <RotateTransform Angle="{Binding SecondAngle}" CenterX="100" CenterY="100"/>
+                    </Line.RenderTransform>
+                </Line>
+
+                <!-- Chấm tâm -->
+                <Ellipse Width="10" Height="10" Fill="#673AB7" Canvas.Left="95" Canvas.Top="95"/>
+            </Canvas>
+
+            <!-- Lịch -->
+            <Border Background="White" CornerRadius="6" Padding="5" Margin="0,10">
+                <Calendar BorderThickness="0"
+              FocusVisualStyle="{x:Null}"
+              SelectedDate="{Binding SelectedDate, Mode=TwoWay}" />
+            </Border>
+
+        </StackPanel>
+
+    </Grid>
+</Page>

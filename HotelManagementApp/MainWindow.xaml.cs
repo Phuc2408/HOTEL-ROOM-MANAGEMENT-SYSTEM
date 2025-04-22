@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HotelManagementApp;
+using HotelManagementApp.Views;
 
 namespace HotelManagementApp
 {
@@ -18,10 +19,39 @@ namespace HotelManagementApp
         {
             InitializeComponent(); // <- không được lỗi
         }
-        private void GuestMenu_Click(object sender, MouseButtonEventArgs e)
+
+        // Navigate to Guests
+        private void NavigateToGuest(object sender, MouseButtonEventArgs e)
         {
-            MainContentFrame.Navigate(new GuestManagement());
+            MainFrame.Navigate(new GuestManagement());
+        }
+        private void NavigateToDashBoard(object sender, MouseButtonEventArgs e)
+        {
+            MainFrame.Navigate(new DashBoard());
         }
 
+        // Navigate to Rooms
+        private void NavigateToRooms(object sender, MouseButtonEventArgs e)
+        {
+            MainFrame.Navigate(new RoomManagement());
+        }
+
+        // Navigate to Billing
+        private void NavigateToInvoice(object sender, MouseButtonEventArgs e)
+        {
+            MainFrame.Navigate(new InvoiceManagement());
+        }
+
+        //Navigate to Services
+        private void NavigateToServices(object sender, MouseButtonEventArgs e)
+        {
+            MainFrame.Navigate(new ServicesPage());
+        }
+
+        // Navigate to Report
+        private void NavigateToReport(object sender, MouseButtonEventArgs e)
+        {
+            MainFrame.Navigate(new ReportPage());
+        }
     }
 }

@@ -1,0 +1,129 @@
+﻿<Page x:Class="HotelManagementApp.Views.InvoiceDetail"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="Invoice Detail"
+      Background="White">
+
+    <Border Background="White" CornerRadius="12" Padding="20">
+        <StackPanel>
+            <TextBlock Text="Invoice Detail"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
+
+            <Grid Margin="0,0,0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Guest Name -->
+                <TextBox Grid.Row="0" Grid.Column="0"
+                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="Guest name"
+                         IsReadOnly="True"
+                         Text="{Binding GuestName, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- ID Card -->
+                <TextBox Grid.Row="0" Grid.Column="1"
+                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="ID Card"
+                         IsReadOnly="True"
+                         Text="{Binding IdCard, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Phone Number -->
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="Phone number"
+                         IsReadOnly="True"
+                         Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Country -->
+                <TextBox Grid.Row="1" Grid.Column="1"
+         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+         materialDesign:HintAssist.Hint="Country"
+                         IsReadOnly="True"
+         Text="{Binding SelectedCountry, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Room -->
+                <TextBox Grid.Row="2" Grid.Column="0"
+                         Margin="5" IsReadOnly="True"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="Room"
+                         Text="{Binding RoomId}" />
+
+                <!-- Number of people -->
+                <TextBox Grid.Row="2" Grid.Column="1"
+                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:HintAssist.Hint="Number of people"
+                         IsReadOnly="True"
+                         Text="{Binding PeopleCount}" />
+
+                <!-- Check In Date -->
+                <DatePicker Grid.Row="3" Grid.Column="0"
+                            Margin="5" Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                            materialDesign:HintAssist.Hint="Check In"
+                            IsEnabled="False"
+                            SelectedDate="{Binding CheckInDate}" />
+
+                <!-- Check Out Date -->
+                <DatePicker Grid.Row="3" Grid.Column="1"
+                            Margin="5" Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                            materialDesign:HintAssist.Hint="Check Out"
+                            IsEnabled="False"
+                            SelectedDate="{Binding CheckOutDate}" />
+            </Grid>
+            <!--List -->
+            <DataGrid Grid.Row="2" ItemsSource="{Binding Services}" AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" IsReadOnly="True" Margin="0 0 0 0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Service" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="*"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="*"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="*"/>
+                </DataGrid.Columns>
+
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridRow" x:Key="CustomRowStyle">
+                        <Style.Triggers>
+                            <!-- Tổng: đậm + đỏ -->
+                            <DataTrigger Binding="{Binding Total}" Value="True">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="Red"/>
+                            </DataTrigger>
+                            <!-- Overdue: đỏ -->
+                            <DataTrigger Binding="{Binding Overdue}" Value="True">
+                                <Setter Property="Foreground" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.RowStyle>
+                    <StaticResource ResourceKey="CustomRowStyle"/>
+                </DataGrid.RowStyle>
+            </DataGrid>
+
+
+            <!-- Total + Button -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+                <Button Content="Close"
+                        Margin="5" Width="100"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Click="CloseButton_Click" />    
+            </StackPanel>
+
+            
+        </StackPanel>
+    </Border>
+</Page>
