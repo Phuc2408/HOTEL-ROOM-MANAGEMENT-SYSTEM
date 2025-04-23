@@ -10,6 +10,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HotelManagementApp;
 using HotelManagementApp.Views;
+using System.IO;                 // Cho File, Path
+using System.Data.SqlClient;     // Cho SqlConnection, SqlCommand, SqlException
 
 namespace HotelManagementApp
 {
@@ -18,6 +20,8 @@ namespace HotelManagementApp
         public MainWindow()
         {
             InitializeComponent(); // <- không được lỗi
+            RebuildDatabaseOnStartup();
+            NavigateToDashBoard(null, null); // Navigate to DashBoard on startup
         }
 
         // Navigate to Guests
@@ -52,6 +56,41 @@ namespace HotelManagementApp
         private void NavigateToReport(object sender, MouseButtonEventArgs e)
         {
             MainFrame.Navigate(new ReportPage());
+        }
+        private void RebuildDatabaseOnStartup()
+        {
+            string scriptPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database\\HotelDB.sql");
+            if (!File.Exists(scriptPath))
+            {
+                MessageBox.Show("ERROR WHEN CREATE DATABASE!");
+                return;
+            }
+
+            string script = File.ReadAllText(scriptPath);
+            string connectionString = @"Server=(LocalDB)\MSSQLLocalDB;Integrated Security=True;";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = conn.CreateCommand();
+
+                    string[] commands = script.Split(new[] { "GO", "go", "Go" }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string command in commands)
+                    {
+                        if (!string.IsNullOrWhiteSpace(command))
+                        {
+                            cmd.CommandText = command;
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show("Lỗi khi tạo lại DB: " + ex.Message);
+            }
         }
     }
 }
