@@ -10,6 +10,13 @@
 
   <ItemGroup>
     <None Remove="Asset\logo.png" />
+    <None Remove="Database\HotelDB.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Database\HotelDB.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +26,7 @@
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.1.0" />
     <PackageReference Include="MaterialDesignColors" Version="2.0.3" />
     <PackageReference Include="MaterialDesignThemes" Version="4.2.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
   <ItemGroup>
