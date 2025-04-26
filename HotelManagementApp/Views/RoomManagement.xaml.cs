@@ -23,13 +23,15 @@ namespace HotelManagementApp.Views
         {
             if (sender is Border border && border.DataContext is RoomModel room)
             {
+                int roomId = room.RoomId;
+
                 switch (room.Status)
                 {
                     case "empty":
                         ShowCheckInDialog(room);
                         break;
                     case "in_use":
-                        ShowCheckOutDialog(room);
+                        ShowCheckOutDialog(room, roomId);
                         break;
                     case "cleaning":
                         ShowCleaningDoneDialog(room);
@@ -59,7 +61,7 @@ namespace HotelManagementApp.Views
                 }
             }
         }
-        private void ShowCheckOutDialog(RoomModel room)
+        private void ShowCheckOutDialog(RoomModel room, int roomId)
         {
             var dialog = new CheckOutDialog(room); // sẽ tạo sau
             if (dialog.ShowDialog() == true)

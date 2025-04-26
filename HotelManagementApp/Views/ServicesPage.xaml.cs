@@ -1,4 +1,5 @@
 ﻿using HotelManagementApp.Models;
+using HotelManagementApp.ViewModels;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
@@ -27,13 +28,14 @@ namespace HotelManagementApp.Views
         public ServicesPage()
         {
             InitializeComponent();
+            DataContext = new ServiceViewModel();
         }
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedService = (ServiceModel)((Button)sender).DataContext;
+            var selectedService = (Service)((Button)sender).DataContext;
 
             // Điều hướng sang EditService Page, truyền service
-            this.NavigationService?.Navigate(new EditService(selectedService));
+            //this.NavigationService?.Navigate(new EditService(selectedService));
         }
 
         private void InsertButton_Click(object sender, RoutedEventArgs e)

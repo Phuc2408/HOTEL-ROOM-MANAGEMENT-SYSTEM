@@ -4,11 +4,14 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using HotelManagementApp.Models;
 using System.Windows.Media;
+using HotelManagementApp.Database; // đúng namespace AppDbContext
+using System;
 
 namespace HotelManagementApp.ViewModels
 {
     public class GuestManagementViewModel : INotifyPropertyChanged
     {
+        private AppDbContext _context;
         private ObservableCollection<GuestModel> _guests;
         public ObservableCollection<GuestModel> Guests
         {
@@ -22,31 +25,37 @@ namespace HotelManagementApp.ViewModels
 
         public GuestManagementViewModel()
         {
-            // Dữ liệu mẫu
-            var guestList = new List<GuestModel>
-            {
-                new GuestModel { GuestName = "Nguyễn Văn A", IdCard = "KA0963", PhoneNumber = "(225) 555-0118", Email = "nguyenvana@example.com", Country = "Vietnam", Room = "Room 101", CheckInDate = new DateTime(2025, 4, 15), CheckOutDate = new DateTime(2025, 4, 20), StatusColor = Brushes.Green },
-                new GuestModel { GuestName = "Trần Thị B", IdCard = "KA0964", PhoneNumber = "(225) 555-0120", Email = "tranb@example.com", Country = "Vietnam", Room = "Room 102", CheckInDate = new DateTime(2025, 4, 14), CheckOutDate = new DateTime(2025, 4, 18), StatusColor = Brushes.Red }
-            };
+            _context = new AppDbContext();
+            LoadGuests();
+        }
 
-            // Tạo danh sách và thêm STT tự động
-            Guests = new ObservableCollection<GuestModel>(
-                guestList.Select((guest, index) => new GuestModel
-                {
-                    GuestName = guest.GuestName,
-                    IdCard = guest.IdCard,
-                    PhoneNumber = guest.PhoneNumber,
-                    Email = guest.Email,
-                    Country = guest.Country,
-                    Room = guest.Room,
-                    CheckInDate = guest.CheckInDate,
-                    CheckOutDate = guest.CheckOutDate,
-                    StatusColor = guest.StatusColor
-                }));
+        private void LoadGuests()
+        {
+            var guestList = (from rent in _context.Rent
+                             join customer in _context.Customer on rent.CID equals customer.CID
+                             join room in _context.Room on rent.RID equals room.RID
+                             where rent.CheckInDate == _context.Rent
+                                 .Where(r2 => r2.RID == rent.RID)
+                                 .Max(r2 => r2.CheckInDate)
+                             select new GuestModel
+                             {
+                                 GuestName = customer.CName,
+                                 IdCard = customer.CPersonalID,
+                                 PhoneNumber = customer.CPhone,
+                                 Email = customer.CMail,
+                                 Country = customer.CCountry,
+                                 Room = "Room " + room.RID,
+                                 CheckInDate = rent.CheckInDate,
+                                 CheckOutDate = rent.CheckOutDate,
+                                 StatusColor = (room.RStatus == "in_use") ? Brushes.Green :
+                                               (room.RStatus == "checked_out" || room.RStatus == "overdue") ? Brushes.Red :
+                                               Brushes.Gray
+                             }).ToList();
+
+            Guests = new ObservableCollection<GuestModel>(guestList);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
