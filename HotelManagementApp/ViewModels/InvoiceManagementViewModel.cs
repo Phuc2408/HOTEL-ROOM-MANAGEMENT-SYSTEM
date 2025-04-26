@@ -1,15 +1,16 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Linq;
 using HotelManagementApp.Models;
+using HotelManagementApp.Database; // DbContext của bạn
 
 namespace HotelManagementApp.ViewModels
 {
     public class InvoiceManagementViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<InvoiceModel> _invoices;
-
-        public ObservableCollection<InvoiceModel> Invoices
+        private ObservableCollection<InvoiceDisplayModel> _invoices;
+        public ObservableCollection<InvoiceDisplayModel> Invoices
         {
             get => _invoices;
             set
@@ -19,19 +20,32 @@ namespace HotelManagementApp.ViewModels
             }
         }
 
-        // Constructor
         public InvoiceManagementViewModel()
         {
-            // Tạo dữ liệu mẫu cho Invoice
-            Invoices = new ObservableCollection<InvoiceModel>
+            LoadInvoicesFromDatabase();
+        }
+
+        private void LoadInvoicesFromDatabase()
+        {
+            using (var context = new AppDbContext())
             {
-                new InvoiceModel { InvoiceID = "INV001", GuestName = "Nguyễn Văn A", RentID = "RNT123", CheckOutDate = DateTime.Now, Total = 2500000 },
-                new InvoiceModel { InvoiceID = "INV002", GuestName = "Trần Thị B", RentID = "RNT124", CheckOutDate = DateTime.Now.AddDays(1), Total = 3000000 }
-            };
+                var invoiceList = (from invoice in context.Invoice
+                                   join customer in context.Customer on invoice.CID equals customer.CID
+                                   join rent in context.Rent on invoice.RelID equals rent.RelID
+                                   select new InvoiceDisplayModel
+                                   {
+                                       InvoiceID = "INV" + invoice.IID.ToString("D3"),
+                                       GuestName = customer.CName,
+                                       RentID = "RNT" + rent.RelID.ToString(),
+                                       CheckOutDate = rent.CheckOutDate,
+                                       Total = invoice.Total
+                                   }).ToList();
+
+                Invoices = new ObservableCollection<InvoiceDisplayModel>(invoiceList);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

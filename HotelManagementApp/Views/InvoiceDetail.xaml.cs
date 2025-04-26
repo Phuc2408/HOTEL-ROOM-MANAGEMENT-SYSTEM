@@ -21,13 +21,13 @@ namespace HotelManagementApp.Views
     /// </summary>
     public partial class InvoiceDetail : Page
     {
-        private InvoiceModel _invoice;
+        private Invoice _invoice;
 
         public InvoiceDetail()
         {
         }
 
-        public InvoiceDetail(InvoiceModel invoice)
+        public InvoiceDetail(Invoice invoice)
         {
             InitializeComponent();
             _invoice = invoice;

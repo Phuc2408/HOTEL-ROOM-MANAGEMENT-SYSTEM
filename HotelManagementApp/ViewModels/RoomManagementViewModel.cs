@@ -1,11 +1,12 @@
 ﻿using HotelManagementApp.Models;
+using HotelManagementApp.Database;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using System.Globalization;
-
+using System.Windows;
 
 namespace HotelManagementApp.ViewModels
 {
@@ -32,41 +33,35 @@ namespace HotelManagementApp.ViewModels
 
         public ICommand ChangeFloorCommand { get; }
 
-
         public RoomManagementViewModel()
         {
-            // Không cần GenerateSampleRooms nữa
-            Rooms = new ObservableCollection<RoomModel>
-    {
-        new RoomModel { RoomId = 101, Floor = 1, Status = "in_use", GuestName = "Anh", CheckInDate = DateTime.Today },
-    new RoomModel { RoomId = 102, Floor = 1,RoomType = "Deluxe", Status = "in_use", GuestName = "Bình", CheckInDate = DateTime.Today.AddDays(-1) },
-    new RoomModel { RoomId = 103, Floor = 1,RoomType = "Suit", Status = "cleaning" },
-    new RoomModel { RoomId = 104, Floor = 1,RoomType = "Double Bed", Status = "repairing" },
-    new RoomModel { RoomId = 105, Floor = 1,RoomType = "Deluxe", Status = "overdue", GuestName = "Chị Lan", CheckInDate = DateTime.Today.AddDays(-3) },
-    new RoomModel { RoomId = 106, Floor = 1,RoomType = "Deluxe", Status = "empty" },
-    new RoomModel { RoomId = 107, Floor = 1,RoomType = "Deluxe", Status = "empty" },
-    new RoomModel { RoomId = 108, Floor = 1, Status = "in_use", GuestName = "Đạt", CheckInDate = DateTime.Today },
-    new RoomModel { RoomId = 109, Floor = 1, Status = "cleaning" },
-    new RoomModel { RoomId = 110, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 111, Floor = 1, Status = "repairing" },
-    new RoomModel { RoomId = 112, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 113, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 114, Floor = 1, Status = "overdue", GuestName = "Hải", CheckInDate = DateTime.Today.AddDays(-2) },
-    new RoomModel { RoomId = 115, Floor = 1, Status = "in_use", GuestName = "Kim", CheckInDate = DateTime.Today },
-    new RoomModel { RoomId = 116, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 117, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 118, Floor = 1, Status = "cleaning" },
-    new RoomModel { RoomId = 119, Floor = 1, Status = "repairing" },
-    new RoomModel { RoomId = 120, Floor = 1, Status = "in_use", GuestName = "Linh", CheckInDate = DateTime.Today },
-    new RoomModel { RoomId = 121, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 122, Floor = 1, Status = "overdue", GuestName = "Mai", CheckInDate = DateTime.Today.AddDays(-4) },
-    new RoomModel { RoomId = 123, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 124, Floor = 1, Status = "in_use", GuestName = "Nam", CheckInDate = DateTime.Today },
-    new RoomModel { RoomId = 125, Floor = 1, Status = "empty" },
-    new RoomModel { RoomId = 126, Floor = 1, Status = "cleaning" },
-    new RoomModel { RoomId = 127, Floor = 1, Status = "repairing" },
-    new RoomModel { RoomId = 128, Floor = 1, Status = "empty" },
-    };
+            try
+            {
+                using (var context = new AppDbContext())
+                {
+                    var roomsFromDb = (from room in context.Room
+                                       join rent in context.Rent on room.RID equals rent.RID into rentGroup
+                                       from rent in rentGroup.DefaultIfEmpty()
+                                       join cust in context.Customer on rent.CID equals cust.CID into custGroup
+                                       from cust in custGroup.DefaultIfEmpty()
+                                       select new RoomModel
+                                       {
+                                           RID = room.RID,
+                                           RFloor = room.RFloor,
+                                           RType = room.RType,
+                                           RStatus = room.RStatus,
+                                           CName = cust.CName,
+                                           CheckInDate = rent.CheckInDate
+                                       }).ToList();
+
+                    Rooms = new ObservableCollection<RoomModel>(roomsFromDb);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi load RoomModel: {ex.Message}", "Lỗi dữ liệu");
+                Rooms = new ObservableCollection<RoomModel>();
+            }
 
             ChangeFloorCommand = new RelayCommand<int>(floor => SelectedFloor = floor);
             UpdateFilteredRooms();
@@ -75,13 +70,18 @@ namespace HotelManagementApp.ViewModels
         private void UpdateFilteredRooms()
         {
             FilteredRooms.Clear();
-            foreach (var room in Rooms.Where(r => r.Floor == SelectedFloor))
+            if (Rooms == null) return;
+
+            foreach (var room in Rooms.Where(r => r.RFloor == SelectedFloor))
+            {
                 FilteredRooms.Add(room);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
         private DateTime _currentDate = DateTime.Today;
         public DateTime CurrentDate
         {

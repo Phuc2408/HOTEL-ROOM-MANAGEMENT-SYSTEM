@@ -17,8 +17,6 @@ namespace HotelManagementApp.Views
         {
             InitializeComponent();
 
-           
-
             // Gán dữ liệu khách vào DataGrid
         }
 

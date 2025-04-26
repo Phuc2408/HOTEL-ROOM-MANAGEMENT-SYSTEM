@@ -103,7 +103,7 @@ FontSize="14">
       VerticalAlignment="Top"
       Background="White"
       BorderThickness="0"
-      ItemsSource="{Binding Service}"
+      ItemsSource="{Binding Services}"
       SelectedItem="{Binding SelectedService, Mode=TwoWay}">
 
             <DataGrid.Columns>
@@ -124,7 +124,7 @@ FontSize="14">
                 </DataGridCheckBoxColumn>
 
                 <!-- service Name -->
-                <DataGridTextColumn Header="Service Name" Binding="{Binding ServiceName}" Width="*">
+                <DataGridTextColumn Header="Service Name" Binding="{Binding SName}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextAlignment" Value="Left"/>
@@ -134,7 +134,7 @@ FontSize="14">
                 </DataGridTextColumn>
 
                 <!-- IDservice -->
-                <DataGridTextColumn Header="Service ID" Binding="{Binding ServiceID}" Width="*">
+                <DataGridTextColumn Header="Service ID" Binding="{Binding SID}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextAlignment" Value="Left"/>
@@ -144,7 +144,7 @@ FontSize="14">
                 </DataGridTextColumn>
 
                 <!-- unit -->
-                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="*">
+                <DataGridTextColumn Header="Unit" Binding="{Binding SUnit}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextAlignment" Value="Left"/>
@@ -154,7 +154,7 @@ FontSize="14">
                 </DataGridTextColumn>
 
                 <!-- unit price -->
-                <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice}" Width="*">
+                <DataGridTextColumn Header="Unit Price" Binding="{Binding SPrice}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextAlignment" Value="Left"/>
