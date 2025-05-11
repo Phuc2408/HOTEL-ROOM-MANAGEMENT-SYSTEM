@@ -73,7 +73,7 @@
       VerticalAlignment="Top"
       Background="White"
       BorderThickness="0"
-      ItemsSource="{Binding Invoices}">
+      ItemsSource="{Binding Invoices}" SelectionChanged="InvoiceDataGrid_SelectionChanged">
 
             <DataGrid.Columns >
                 <!-- Checkbox -->
@@ -131,11 +131,17 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Background="LightGray" CornerRadius="5" Padding="4" HorizontalAlignment="Left">
-                                <Button Content="Detail" Style="{StaticResource IconButtonStyle}" Click="DetailButton_Click" Margin="5"
-                           FontSize="13"
-                           FontWeight="Normal"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Left"/>
+                                <Button Content="Detail"
+        Style="{StaticResource IconButtonStyle}"
+        Click="DetailButton_Click"
+        Margin="5"
+        FontSize="13"
+        FontWeight="Normal"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Left"
+        DataContext="{Binding}" />
+                                <!-- 🟢 Dòng này là quan trọng nhất -->
+
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

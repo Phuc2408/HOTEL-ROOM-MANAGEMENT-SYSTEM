@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using HotelManagementApp.Views;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -9,6 +10,6 @@ namespace HotelManagementApp
     /// </summary>
     public partial class App : Application
     {
-    }
 
+    }
 }

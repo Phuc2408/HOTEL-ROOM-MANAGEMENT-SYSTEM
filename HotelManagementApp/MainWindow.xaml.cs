@@ -26,7 +26,6 @@ namespace HotelManagementApp
             RebuildDatabaseOnStartup();
             NavigateToDashBoard(null, null); // Navigate to DashBoard on startup
         }
-
         // Navigate to Guests
         private void NavigateToGuest(object sender, MouseButtonEventArgs e)
         {

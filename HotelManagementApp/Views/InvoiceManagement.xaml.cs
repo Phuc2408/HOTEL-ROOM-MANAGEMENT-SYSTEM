@@ -1,24 +1,48 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using HotelManagementApp.Database;
 using HotelManagementApp.Models;
-using HotelManagementApp.ViewModels;
 
 namespace HotelManagementApp.Views
 {
     public partial class InvoiceManagement : Page
     {
-        // Khởi tạo ViewModel và gán cho DataContext
         public InvoiceManagement()
         {
             InitializeComponent();
         }
+
         private void DetailButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedInvoice = ((Button)sender).DataContext as Invoice;
+            var button = sender as Button;
+            var displayModel = button?.DataContext as InvoiceDisplayModel;
 
-            // Điều hướng sang trang Edit và truyền selectedGuest (nếu cần)
-            this.NavigationService?.Navigate(new InvoiceDetail(selectedInvoice));
+            if (displayModel == null)
+            {
+                MessageBox.Show("Không lấy được hóa đơn.");
+                return;
+            }
 
+            using (var context = new AppDbContext())
+            {
+                // Dùng chính IID để lấy từ DB
+                var invoiceEntity = context.Invoice.FirstOrDefault(i => i.IID == displayModel.IID);
+
+                if (invoiceEntity != null)
+                {
+                    this.NavigationService?.Navigate(new InvoiceDetail(invoiceEntity));
+                }
+                else
+                {
+                    MessageBox.Show($"Không tìm thấy hóa đơn với IID = {displayModel.IID}");
+                }
+            }
+        }
+
+        private void InvoiceDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // (nếu cần xử lý chọn dòng thì thêm sau)
         }
     }
 }

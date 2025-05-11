@@ -1,45 +1,56 @@
-﻿using HotelManagementApp.Models;
-using System;
-using System.Collections.Generic;
+﻿// InvoiceDetail.xaml.cs
+using HotelManagementApp.Models;
+using HotelManagementApp.ViewModels;
+using HotelManagementApp.Database;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace HotelManagementApp.Views
 {
-    /// <summary>
-    /// Interaction logic for DetailInvoice.xaml
-    /// </summary>
     public partial class InvoiceDetail : Page
     {
-        private Invoice _invoice;
-
-        public InvoiceDetail()
-        {
-        }
-
         public InvoiceDetail(Invoice invoice)
         {
             InitializeComponent();
-            _invoice = invoice;
 
-            // Hiển thị dữ liệu nếu cần
-            this.DataContext = _invoice;
+            
+
+            var vm = new InvoiceDetailViewModel(invoice);
+            this.DataContext = vm;
+
 
         }
+
+        public InvoiceDetail() : this(GetSampleInvoice()) {
+            MessageBox.Show("Constructor mặc định được gọi");
+        }
+
+        private static Invoice GetSampleInvoice()
+        {
+            MessageBox.Show("Vào được GetSampleInvoice");
+            using var context = new AppDbContext();
+            var invoice = context.Invoice.FirstOrDefault();
+
+            if (invoice == null)
+            {
+                MessageBox.Show("Không tìm thấy invoice nào trong cơ sở dữ liệu.");
+            }
+            else
+            {
+                MessageBox.Show($"Lấy được invoice ID: {invoice.IID}");
+            }
+
+            return invoice;
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-
             this.NavigationService?.GoBack();
+        }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
         }
     }
 }
