@@ -8,122 +8,179 @@
       Title="Invoice Detail"
       Background="White">
 
-    <Border Background="White" CornerRadius="12" Padding="20">
-        <StackPanel>
-            <TextBlock Text="Invoice Detail"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Margin="0,0,0,20"/>
+    <Border Background="White" CornerRadius="12" Padding="20" Width="1250" Height="700" RenderTransformOrigin="0.5,0.5">
+        <Border.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform AngleX="-0.449"/>
+                <RotateTransform/>
+                <TranslateTransform X="3.592"/>
+            </TransformGroup>
+        </Border.RenderTransform>
 
-            <Grid Margin="0,0,0,10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <!-- Guest Name -->
-                <TextBox Grid.Row="0" Grid.Column="0"
-                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                         materialDesign:HintAssist.Hint="Guest name"
-                         IsReadOnly="True"
-                         Text="{Binding GuestName, UpdateSourceTrigger=PropertyChanged}" />
+            <!-- Header + Info -->
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="Invoice Detail"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Margin="0,0,0,20"/>
 
-                <!-- ID Card -->
-                <TextBox Grid.Row="0" Grid.Column="1"
-                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                         materialDesign:HintAssist.Hint="ID Card"
-                         IsReadOnly="True"
-                         Text="{Binding IdCard, UpdateSourceTrigger=PropertyChanged}" />
+                <Grid Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- Phone Number -->
-                <TextBox Grid.Row="1" Grid.Column="0"
-                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                         materialDesign:HintAssist.Hint="Phone number"
-                         IsReadOnly="True"
-                         Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Row="0" Grid.Column="0"
+                             Margin="5"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Guest name"
+                             IsReadOnly="True"
+                             Text="{Binding Invoice.GuestName}" />
 
-                <!-- Country -->
-                <TextBox Grid.Row="1" Grid.Column="1"
-         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
-         materialDesign:HintAssist.Hint="Country"
-                         IsReadOnly="True"
-         Text="{Binding SelectedCountry, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             Margin="5"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="ID Card"
+                             IsReadOnly="True"
+                             Text="{Binding Invoice.IdCard}" />
 
-                <!-- Room -->
-                <TextBox Grid.Row="2" Grid.Column="0"
-                         Margin="5" IsReadOnly="True"
-                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                         materialDesign:HintAssist.Hint="Room"
-                         Text="{Binding RoomId}" />
+                    <TextBox Grid.Row="1" Grid.Column="0"
+                             Margin="5"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Phone number"
+                             IsReadOnly="True"
+                             Text="{Binding Invoice.PhoneNumber}" />
 
-                <!-- Number of people -->
-                <TextBox Grid.Row="2" Grid.Column="1"
-                         Margin="5" Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                         materialDesign:HintAssist.Hint="Number of people"
-                         IsReadOnly="True"
-                         Text="{Binding PeopleCount}" />
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             Margin="5"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Country"
+                             IsReadOnly="True"
+                             Text="{Binding Invoice.SelectedCountry}" />
 
-                <!-- Check In Date -->
-                <DatePicker Grid.Row="3" Grid.Column="0"
-                            Margin="5" Style="{StaticResource MaterialDesignOutlinedDatePicker}"
-                            materialDesign:HintAssist.Hint="Check In"
-                            IsEnabled="False"
-                            SelectedDate="{Binding CheckInDate}" />
+                    <TextBox Grid.Row="2" Grid.Column="0"
+                             Margin="5"
+                             IsReadOnly="True"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Room"
+                             Text="{Binding Invoice.RoomId}" />
 
-                <!-- Check Out Date -->
-                <DatePicker Grid.Row="3" Grid.Column="1"
-                            Margin="5" Style="{StaticResource MaterialDesignOutlinedDatePicker}"
-                            materialDesign:HintAssist.Hint="Check Out"
-                            IsEnabled="False"
-                            SelectedDate="{Binding CheckOutDate}" />
-            </Grid>
-            <!--List -->
-            <DataGrid Grid.Row="2" ItemsSource="{Binding Services}" AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" IsReadOnly="True" Margin="0 0 0 0">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Service" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="*"/>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="*"/>
-                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="*"/>
-                </DataGrid.Columns>
+                    <TextBox Grid.Row="2" Grid.Column="1"
+                             Margin="5"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Number of people"
+                             IsReadOnly="True"
+                             Text="{Binding Invoice.PeopleCount}" />
 
-                <DataGrid.Resources>
-                    <Style TargetType="DataGridRow" x:Key="CustomRowStyle">
-                        <Style.Triggers>
-                            <!-- Tổng: đậm + đỏ -->
-                            <DataTrigger Binding="{Binding Total}" Value="True">
-                                <Setter Property="FontWeight" Value="Bold"/>
-                                <Setter Property="Foreground" Value="Red"/>
-                            </DataTrigger>
-                            <!-- Overdue: đỏ -->
-                            <DataTrigger Binding="{Binding Overdue}" Value="True">
-                                <Setter Property="Foreground" Value="Red"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </DataGrid.Resources>
+                    <DatePicker Grid.Row="3" Grid.Column="0"
+                                Margin="5"
+                                Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                materialDesign:HintAssist.Hint="Check In"
+                                IsEnabled="False"
+                                SelectedDate="{Binding Invoice.CheckInDate}" />
 
-                <DataGrid.RowStyle>
-                    <StaticResource ResourceKey="CustomRowStyle"/>
-                </DataGrid.RowStyle>
-            </DataGrid>
-
-
-            <!-- Total + Button -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-
-                <Button Content="Close"
-                        Margin="5" Width="100"
-                        Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Click="CloseButton_Click" />    
+                    <DatePicker Grid.Row="3" Grid.Column="1"
+                                Margin="5"
+                                Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                materialDesign:HintAssist.Hint="Check Out"
+                                IsEnabled="False"
+                                SelectedDate="{Binding Invoice.CheckOutDate}" />
+                </Grid>
             </StackPanel>
 
-            
-        </StackPanel>
+            <!-- Services Table -->
+            <Border Grid.Row="1" BorderThickness="1" BorderBrush="Gray" CornerRadius="4" Margin="0,10,0,10">
+                <DataGrid ItemsSource="{Binding Invoice.Services}"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          Margin="0"
+                          SelectionChanged="DataGrid_SelectionChanged">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Service" Binding="{Binding Name}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Padding" Value="10,0,0,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="*"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="*"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="*"/>
+                    </DataGrid.Columns>
+
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow" x:Key="CustomRowStyle">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Total}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Overdue}" Value="True">
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+
+                    <DataGrid.RowStyle>
+                        <StaticResource ResourceKey="CustomRowStyle"/>
+                    </DataGrid.RowStyle>
+                </DataGrid>
+            </Border>
+
+            <Grid Grid.Row="2" Margin="0,0,10,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Total:"
+               FontSize="16"
+               FontWeight="Bold"
+               VerticalAlignment="Center"
+               Grid.Column="0"/>
+
+                <TextBlock Text="{Binding TotalAmount, StringFormat='{}{0:#,##0} ₫'}"
+               FontSize="16"
+               FontWeight="Bold"
+               Grid.Column="1"
+               HorizontalAlignment="Right"
+               VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- Close Button -->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="1"
+                        Content="Close"
+                        Width="100"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Click="CloseButton_Click"
+                        HorizontalAlignment="Right"
+                        Margin="0,10,0,0"/>
+            </Grid>
+        </Grid>
     </Border>
 </Page>
