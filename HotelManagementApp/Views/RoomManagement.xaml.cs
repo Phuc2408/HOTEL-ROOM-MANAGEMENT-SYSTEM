@@ -27,7 +27,7 @@ namespace HotelManagementApp.Views
 
                 switch (room.Status)
                 {
-                    case "empty":
+                    case "available":
                         ShowCheckInDialog(room);
                         break;
                     case "in_use":
