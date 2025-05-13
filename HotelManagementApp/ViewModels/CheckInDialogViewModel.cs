@@ -7,17 +7,53 @@ namespace HotelManagementApp.ViewModels  // 🔴 Bắt buộc!
     public class CheckInDialogViewModel : INotifyPropertyChanged
     {
         // Thông tin khách
-        public string GuestName { get; set; }
-        public string IdCard { get; set; }
-        public string PhoneNumber { get; set; }
-        public string SelectedCountry { get; set; }
+        private string _guestName;
+        public string GuestName
+        {
+            get => _guestName;
+            set => SetProperty(ref _guestName, value);
+        }
+        private string _idCard;
+        public string IdCard
+        {
+            get => _idCard;
+            set => SetProperty(ref _idCard, value);
+        }
+        private string _phoneNumber;
+        public string PhoneNumber
+        {
+            get => _phoneNumber;
+            set => SetProperty(ref _phoneNumber, value);
+        }
+        private string _selectedCountry;
+        public string SelectedCountry
+        {
+            get => _selectedCountry;
+            set => SetProperty(ref _selectedCountry, value);
+        }
 
         // Thông tin phòng & đặt phòng
-        public string RoomId { get; set; }          // Dạng string từ UI
-        public string PeopleCount { get; set; }     // Dạng string từ UI
+        public string RoomId { get; set; }       
 
-        public DateTime? CheckInDate { get; set; } = DateTime.Today;
-        public DateTime? CheckOutDate { get; set; } = DateTime.Today.AddDays(1);
+        private string _peopleCount;
+        public string PeopleCount
+        {
+            get => _peopleCount;
+            set => SetProperty(ref _peopleCount, value);
+        }
+
+        private DateTime? _checkInDate = DateTime.Today;
+        public DateTime? CheckInDate
+        {
+            get => _checkInDate;
+            set => SetProperty(ref _checkInDate, value);
+        }
+        private DateTime? _checkOutDate = DateTime.Today.AddDays(1);
+        public DateTime? CheckOutDate
+        {
+            get => _checkOutDate;
+            set => SetProperty(ref _checkOutDate, value);
+        }
 
         // Giá trị convert sẵn để gọi Service
         public int RoomIdInt => int.TryParse(RoomId, out int r) ? r : 0;
@@ -39,10 +75,7 @@ namespace HotelManagementApp.ViewModels  // 🔴 Bắt buộc!
             return true;
         }
 
-        public CheckInDialogViewModel()
-        {
-            // No need for countries list anymore
-        }
+        
         
     }
 
