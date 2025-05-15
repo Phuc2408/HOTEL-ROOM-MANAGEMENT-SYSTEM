@@ -1,5 +1,7 @@
-﻿using HotelManagementApp.Models;
+﻿using HotelManagementApp.Database;
+using HotelManagementApp.Models;
 using HotelManagementApp.ViewModels;
+using HotelManagementApp.Views.Dialogs;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
@@ -32,17 +34,30 @@ namespace HotelManagementApp.Views
         }
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedService = (Service)((Button)sender).DataContext;
-
-            // Điều hướng sang EditService Page, truyền service
-            //this.NavigationService?.Navigate(new EditService(selectedService));
         }
-
         private void InsertButton_Click(object sender, RoutedEventArgs e)
         {
-            Models.ServiceModel selectedService = null;
-            this.NavigationService?.Navigate(new InsertService(selectedService));
-        }
+            var dialog = new AddServiceDialog();
+            var result = dialog.ShowDialog();
+            if (result == true)
+            {
+                var service = dialog.NewService;
 
+                using (var context = new AppDbContext())
+                {
+                    context.Service.Add(service);
+                    context.SaveChanges();
+                }
+
+                // Refresh lại danh sách
+                if (DataContext is HotelManagementApp.ViewModels.ServiceViewModel vm)
+                {
+                    vm.LoadServices();
+                }
+            }
+        }
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+        }
     }
 }

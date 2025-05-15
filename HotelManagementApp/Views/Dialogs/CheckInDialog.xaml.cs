@@ -29,7 +29,7 @@ namespace HotelManagementApp.Views.Dialogs
 
                     if (cid <= 0)
                     {
-                        MessageBox.Show("❌ Không thể tạo khách hàng.");
+                        MessageBox.Show("Failed to create guest.");
                         return;
                     }
 
@@ -43,18 +43,18 @@ namespace HotelManagementApp.Views.Dialogs
 
                     if (success)
                     {
-                        MessageBox.Show("✅ Check-in thành công!");
+                        MessageBox.Show("Check-in successful!");
                         this.DialogResult = true;
                     }
                     else
                     {
-                        MessageBox.Show("❌ Check-in thất bại khi tạo booking.");
+                        MessageBox.Show("Failed to check in when creating booking.");
                         this.DialogResult = false;
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("❌ Lỗi hệ thống: " + ex.Message);
+                    MessageBox.Show("System error: " + ex.Message);
                     this.DialogResult = false;
                 }
 
