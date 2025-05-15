@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using HotelManagementApp.Models;
 using System.Windows.Media;
-using HotelManagementApp.Database; // đúng namespace AppDbContext
+using HotelManagementApp.Database;
 using System;
 
 namespace HotelManagementApp.ViewModels
@@ -29,7 +29,7 @@ namespace HotelManagementApp.ViewModels
             LoadGuests();
         }
 
-        private void LoadGuests()
+        public void LoadGuests()
         {
             var guestList = (from rent in _context.Rent
                              join customer in _context.Customer on rent.CID equals customer.CID
@@ -39,6 +39,7 @@ namespace HotelManagementApp.ViewModels
                                  .Max(r2 => r2.CheckInDate)
                              select new GuestModel
                              {
+                                 CID = customer.CID,
                                  GuestName = customer.CName,
                                  IdCard = customer.CPersonalID,
                                  PhoneNumber = customer.CPhone,
@@ -53,6 +54,23 @@ namespace HotelManagementApp.ViewModels
                              }).ToList();
 
             Guests = new ObservableCollection<GuestModel>(guestList);
+        }
+
+        public GuestModel? SelectedGuest { get; set; }
+
+        public void UpdateGuest(GuestViewModel guest)
+        {
+            using (var context = new AppDbContext())
+            {
+                var customer = context.Customer.FirstOrDefault(c => c.CID == guest.CID);
+                if (customer != null)
+                {
+                    customer.CName = guest.CName;
+                    customer.CPhone = guest.CPhone;
+                    customer.CPersonalID = guest.CPersonalID;
+                    context.SaveChanges();
+                }
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
