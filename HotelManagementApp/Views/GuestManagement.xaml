@@ -144,15 +144,7 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Email -->
-                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+               
 
                 <!-- Check In Date -->
                 <DataGridTextColumn Header="Check In Date" Binding="{Binding CheckInDate, StringFormat='dd/MM/yyyy'}" Width="*">

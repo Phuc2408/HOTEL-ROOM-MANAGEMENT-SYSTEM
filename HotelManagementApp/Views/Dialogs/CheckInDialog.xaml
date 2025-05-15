@@ -7,9 +7,6 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
 
-    <Window.DataContext>
-        <viewModels:CheckInDialogViewModel />
-    </Window.DataContext>
     
     <Border Background="White" CornerRadius="12" Padding="20">
         <StackPanel>

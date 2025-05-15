@@ -1,5 +1,6 @@
 ﻿using HotelManagementApp.Helpers;
 using HotelManagementApp.ViewModels;
+using System;
 using System.Windows;
 
 namespace HotelManagementApp.Views.Dialogs
@@ -9,10 +10,10 @@ namespace HotelManagementApp.Views.Dialogs
         public CheckInDialog(string roomId)
         {
             InitializeComponent();
-            if (DataContext is ViewModels.CheckInDialogViewModel vm)
-            {
-                vm.RoomId = roomId;
-            }
+
+            var vm = new CheckInDialogViewModel();
+            vm.RoomId = roomId;
+            this.DataContext = vm;
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)

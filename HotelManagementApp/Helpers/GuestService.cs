@@ -1,57 +1,38 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
+﻿using HotelManagementApp.Database;
 using HotelManagementApp.Models;
+using System;
+using System.Windows;
 
 namespace HotelManagementApp.Helpers
 {
     public class GuestService
     {
-        private readonly string connectionString = "Server=(LocalDB)\\MSSQLLocalDB;Integrated Security=True;";
-
-
         public int AddGuest(string name, string idCard, string phone, string country)
         {
-            int newId = -1;
-
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (var context = new AppDbContext())
                 {
-                    string sql = @"
-            INSERT INTO Customer (CName, CPersonalID, CPhone, CMail, CCountry)
-            VALUES (@name, @id, @phone, '', @country);
-            SELECT SCOPE_IDENTITY();";
-
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    var guest = new Customer
                     {
-                        cmd.Parameters.AddWithValue("@name", name);
-                        cmd.Parameters.AddWithValue("@id", idCard);
-                        cmd.Parameters.AddWithValue("@phone", phone);
-                        cmd.Parameters.AddWithValue("@country", country);
+                        CName = name,
+                        CPhone = phone,
+                        CPersonalID = idCard,
+                        CCountry = country,
+                        CMail = "" // Trường này không được null nếu DB yêu cầu
+                    };
 
-                        conn.Open();
-                        var result = cmd.ExecuteScalar();
+                    context.Customer.Add(guest);
+                    context.SaveChanges();
 
-                        if (result != DBNull.Value) // Kiểm tra kết quả trả về hợp lệ
-                        {
-                            newId = Convert.ToInt32(result);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Không thể lấy ID từ SCOPE_IDENTITY.");
-                        }
-                    }
+                    return guest.CID;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Lỗi khi thực thi câu lệnh SQL: " + ex.Message);
+                MessageBox.Show("❌ Lỗi khi thêm khách hàng: " + ex.Message);
+                return -1;
             }
-
-            return newId;
         }
-
-
     }
 }
