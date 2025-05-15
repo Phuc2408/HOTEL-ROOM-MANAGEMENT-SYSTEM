@@ -5,6 +5,7 @@ namespace HotelManagementApp.Models
 {
     public class GuestModel
     {
+        public int CID { get; set; } // <- Bổ sung để đồng bộ với ViewModel và DB
         public string GuestName { get; set; }
         public string IdCard { get; set; }
         public string PhoneNumber { get; set; }
@@ -13,6 +14,6 @@ namespace HotelManagementApp.Models
         public string Room { get; set; }
         public DateTime? CheckInDate { get; set; }
         public DateTime? CheckOutDate { get; set; }
-        public Brush StatusColor { get; set; } // Để đổi màu room theo trạng thái
+        public Brush StatusColor { get; set; }
     }
 }
