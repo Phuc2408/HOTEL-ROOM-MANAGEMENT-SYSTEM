@@ -4,7 +4,6 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
 
 namespace HotelManagementApp.ViewModels
 {
@@ -24,7 +23,7 @@ namespace HotelManagementApp.ViewModels
             }
         }
 
-        public decimal TotalAmount => Invoice?.Total ?? 0;
+        public decimal TotalAmount => Invoice?.Services?.Sum(s => s.Quantity * s.Price) ?? 0;
 
         public InvoiceDetailViewModel(Invoice invoice)
         {
@@ -42,6 +41,7 @@ namespace HotelManagementApp.ViewModels
 
             var customer = _context.Customer.FirstOrDefault(c => c.CID == invoiceDb.CID);
             var rent = _context.Rent.FirstOrDefault(r => r.RelID == invoiceDb.RelID);
+            var room = rent != null ? _context.Room.FirstOrDefault(r => r.RID == rent.RID) : null;
 
             var usages = _context.ServiceUsage
                 .Where(u => u.IID == invoiceDb.IID)
@@ -58,6 +58,18 @@ namespace HotelManagementApp.ViewModels
                     Quantity = u.Quantity
                 };
             }).ToList();
+
+            if (room != null)
+            {
+                var roomLine = new ServiceUsageViewModel
+                {
+                    Name = $"Room Type: {room.RType}",
+                    Unit = "fixed",
+                    Price = room.RPrice,
+                    Quantity = 1
+                };
+                services.Insert(0, roomLine);
+            }
 
             Invoice = new InvoiceViewModel
             {
@@ -82,6 +94,7 @@ namespace HotelManagementApp.ViewModels
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

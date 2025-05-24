@@ -1,14 +1,13 @@
-﻿using HotelManagementApp.ViewModels;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace HotelManagementApp.Models
 {
     public class ServiceModel : INotifyPropertyChanged
     {
-        private string serviceID;
-        public string ServiceID
+        private int serviceID;
+        public int ServiceID
         {
-            get { return serviceID; }
+            get => serviceID;
             set
             {
                 if (serviceID != value)
@@ -22,7 +21,7 @@ namespace HotelManagementApp.Models
         private string serviceName;
         public string ServiceName
         {
-            get { return serviceName; }
+            get => serviceName;
             set
             {
                 if (serviceName != value)
@@ -36,7 +35,7 @@ namespace HotelManagementApp.Models
         private string unit;
         public string Unit
         {
-            get { return unit; }
+            get => unit;
             set
             {
                 if (unit != value)
@@ -50,14 +49,14 @@ namespace HotelManagementApp.Models
         private decimal unitPrice;
         public decimal UnitPrice
         {
-            get { return unitPrice; }
+            get => unitPrice;
             set
             {
                 if (unitPrice != value)
                 {
                     unitPrice = value;
                     OnPropertyChanged(nameof(UnitPrice));
-                    CalculateTotal();  // Recalculate total when UnitPrice changes
+                    CalculateTotal();  // Gọi lại khi giá thay đổi
                 }
             }
         }
@@ -65,25 +64,22 @@ namespace HotelManagementApp.Models
         private int quantity;
         public int Quantity
         {
-            get { return quantity; }
+            get => quantity;
             set
             {
                 if (quantity != value)
                 {
                     quantity = value;
-                    OnPropertyChanged(nameof(Quantity));  // Notify that Quantity changed
-                    CalculateTotal(); // Recalculate total when Quantity changes
-                    OnPropertyChanged(nameof(TotalAmount)); // Notify that TotalAmount changed
-
-                    // Notify the ViewModel to update the filtered services when Quantity changes
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("FilteredServices"));
+                    OnPropertyChanged(nameof(Quantity));
+                    CalculateTotal(); // Gọi lại khi số lượng thay đổi
                 }
             }
         }
+
         private decimal totalAmount;
         public decimal TotalAmount
         {
-            get { return totalAmount; }
+            get => totalAmount;
             private set
             {
                 if (totalAmount != value)
@@ -94,17 +90,14 @@ namespace HotelManagementApp.Models
             }
         }
 
-        // Tính toán tổng số tiền dựa trên UnitPrice và Quantity
+        // Tính lại tổng tiền
         private void CalculateTotal()
         {
-            TotalAmount = UnitPrice * Quantity;  // Tính tổng tiền cho mỗi dịch vụ
+            TotalAmount = UnitPrice * Quantity;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
+        public void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
-
 }

@@ -1,0 +1,44 @@
+﻿<Window x:Class="HotelManagementApp.Views.Dialogs.EditServiceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewModels="clr-namespace:HotelManagementApp.ViewModels"
+        Title="Edit Service"
+        Height="320"
+        Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Tên dịch vụ -->
+        <TextBox Grid.Row="0" Margin="0,0,0,10"
+                 Text="{Binding SName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 materialDesign:HintAssist.Hint="Service Name"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+
+        <!-- Đơn vị -->
+        <TextBox Grid.Row="1" Margin="0,0,0,10"
+                 Text="{Binding SUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 materialDesign:HintAssist.Hint="Unit"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+
+        <!-- Đơn giá -->
+        <TextBox Grid.Row="2" Margin="0,0,0,10"
+                 Text="{Binding SPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 materialDesign:HintAssist.Hint="Unit Price"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+
+        <!-- Nút lưu -->
+        <Button Grid.Row="3" Content="Save" HorizontalAlignment="Right"
+                Margin="0,10,0,0" Width="80"
+                Style="{StaticResource MaterialDesignRaisedButton}"
+                Click="SaveButton_Click" />
+    </Grid>
+</Window>

@@ -20,11 +20,12 @@ namespace HotelManagementApp.Helpers
                         CheckInDate = checkInDate.Date,
                         CheckOutDate = checkOutDate.Date,
                         CheckInTime = DateTime.Now.TimeOfDay,
-                        CheckOutTime = DateTime.Now.AddHours(1).TimeOfDay, // có thể để null nếu cần
+                        CheckOutTime = DateTime.Now.AddHours(1).TimeOfDay, 
                         NumberOfPeople = numberOfPeople
                     };
 
                     context.Rent.Add(rent);
+
                     var room = context.Room.FirstOrDefault(r => r.RID == roomId);
                     if (room != null)
                     {
@@ -33,13 +34,11 @@ namespace HotelManagementApp.Helpers
 
                     context.SaveChanges();
                     return true;
-                    context.SaveChanges();
-                    return true;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("❌ Lỗi khi tạo booking: " + ex.Message);
+                MessageBox.Show("Error while creating booking: " + ex.Message);
                 return false;
             }
         }
@@ -60,7 +59,7 @@ namespace HotelManagementApp.Helpers
             }
             catch (Exception ex)
             {
-                MessageBox.Show("❌ Lỗi khi trả phòng: " + ex.Message);
+                MessageBox.Show("Error while checking out: " + ex.Message);
                 return false;
             }
         }

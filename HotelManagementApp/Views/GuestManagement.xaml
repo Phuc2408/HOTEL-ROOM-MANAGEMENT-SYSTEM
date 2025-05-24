@@ -98,21 +98,7 @@
           SelectedItem="{Binding SelectedGuest, Mode=TwoWay}">
 
             <DataGrid.Columns>
-                <!-- Checkbox -->
-                <DataGridCheckBoxColumn Width="30" Header="" IsReadOnly="True">
-                    <DataGridCheckBoxColumn.ElementStyle>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridCheckBoxColumn.ElementStyle>
-                    <DataGridCheckBoxColumn.EditingElementStyle>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridCheckBoxColumn.EditingElementStyle>
-                </DataGridCheckBoxColumn>
+                
 
                 <!-- Guest Name -->
                 <DataGridTextColumn Header="Guest Name" Binding="{Binding GuestName}" Width="*">
