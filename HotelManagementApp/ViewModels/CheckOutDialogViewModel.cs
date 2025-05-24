@@ -1,110 +1,234 @@
-﻿using HotelManagementApp.Models;
+﻿using HotelManagementApp.Database;
+using HotelManagementApp.Models;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace HotelManagementApp.ViewModels
 {
     public class CheckOutDialogViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<ServiceModel> services;
-        public ObservableCollection<ServiceModel> Services
-        {
-            get { return services; }
-            set
-            {
-                if (services != value)
-                {
-                    services = value;
-                    OnPropertyChanged(nameof(Services));
-                    FilterServices();  // Reapply the filter when Services collection changes
-                }
-            }
-        }
+        public ObservableCollection<ServiceModel> Services { get; set; }
 
         private ICollectionView filteredServices;
         public ICollectionView FilteredServices
         {
-            get { return filteredServices; }
+            get => filteredServices;
             set
             {
-                if (filteredServices != value)
+                filteredServices = value;
+                OnPropertyChanged(nameof(FilteredServices));
+            }
+        }
+
+        private decimal totalPrice;
+        public decimal TotalPrice
+        {
+            get => totalPrice;
+            set
+            {
+                if (totalPrice != value)
                 {
-                    filteredServices = value;
-                    OnPropertyChanged(nameof(FilteredServices));
+                    totalPrice = value;
+                    OnPropertyChanged(nameof(TotalPrice));
                 }
             }
         }
 
-        private decimal totalAmount;
-        public decimal TotalAmount
-        {
-            get { return totalAmount; }
-            set
-            {
-                if (totalAmount != value)
-                {
-                    totalAmount = value;
-                    OnPropertyChanged(nameof(TotalAmount));
-                }
-            }
-        }
+        public int CurrentCustomerId { get; set; }
+        public int CurrentInvoiceId { get; set; }
+
+        private DispatcherTimer saveDelayTimer;
+        private ServiceModel lastChangedService;
+
+        private decimal roomPrice;
+        private string roomType;
+        private ServiceModel roomItemModel;
 
         public CheckOutDialogViewModel()
         {
-            // Example data for services
-            Services = new ObservableCollection<ServiceModel>
-        {
-            new ServiceModel { ServiceID = "1", ServiceName = "Extra Bed", Unit = "Piece", UnitPrice = 20, Quantity = 1 },
-            new ServiceModel { ServiceID = "2", ServiceName = "Breakfast", Unit = "Set", UnitPrice = 10, Quantity = 0 },
-            new ServiceModel { ServiceID = "3", ServiceName = "Laundry", Unit = "Piece", UnitPrice = 5, Quantity = 0 }
-        };
-
-            // Initialize filteredServices and filter
-            FilterServices();
-            CalculateTotalAmount();
-        }
-
-        // Method to filter services based on Quantity > 0
-        public void FilterServices()
-        {
-            var collectionViewSource = new CollectionViewSource();
-            collectionViewSource.Source = Services;
-
-            // Subscribe to the Filter event
-            collectionViewSource.Filter += (sender, args) =>
+            saveDelayTimer = new DispatcherTimer
             {
-                var service = args.Item as ServiceModel;
-                if (service != null)
-                {
-                    args.Accepted = service.Quantity > 0; // Only include services with Quantity > 0
-                }
+                Interval = TimeSpan.FromMilliseconds(600)
             };
+            saveDelayTimer.Tick += SaveDelayTimer_Tick;
 
-            // Update FilteredServices collection
-            FilteredServices = collectionViewSource.View;
+            Services = new ObservableCollection<ServiceModel>();
         }
 
-        // Method to calculate total amount for all services
-        public void CalculateTotalAmount()
+        public void InitializeByRoomId(int roomId)
         {
-            decimal total = 0;
-            foreach (var service in FilteredServices)
+            using (var db = new AppDbContext())
             {
-                var serviceModel = service as ServiceModel;
-                if (serviceModel != null)
+                var rent = db.Rent.FirstOrDefault(r => r.RID == roomId);
+                if (rent == null) return;
+
+                var invoice = db.Invoice.FirstOrDefault(i => i.RelID == rent.RelID);
+                if (invoice == null) return;
+
+                var room = db.Room.FirstOrDefault(r => r.RID == roomId);
+                if (room == null) return;
+
+                roomPrice = room.RPrice;
+                roomType = room.RType;
+
+                CurrentCustomerId = rent.CID;
+                CurrentInvoiceId = invoice.IID;
+            }
+
+            LoadServicesFromDatabase();
+            LoadExistingServiceUsages();
+            FilterServices();
+            CalculateTotalPrice();
+        }
+
+        private void SaveDelayTimer_Tick(object sender, EventArgs e)
+        {
+            saveDelayTimer.Stop();
+            if (lastChangedService != null)
+                SaveOrUpdateServiceUsage(lastChangedService);
+        }
+
+        private void LoadServicesFromDatabase()
+        {
+            using (var db = new AppDbContext())
+            {
+                var serviceEntities = db.Service.ToList();
+
+                foreach (var s in serviceEntities)
                 {
-                    total += serviceModel.TotalAmount; // Sum the TotalAmount of each service
+                    var item = new ServiceModel
+                    {
+                        ServiceID = s.SID,
+                        ServiceName = s.SName,
+                        Unit = s.SUnit,
+                        UnitPrice = s.SPrice,
+                        Quantity = 0
+                    };
+
+                    item.PropertyChanged += Service_PropertyChanged;
+                    Services.Add(item);
+                }
+
+                roomItemModel = new ServiceModel
+                {
+                    ServiceID = -999,
+                    ServiceName = $"Room Type: {roomType}",
+                    Unit = "fixed",
+                    UnitPrice = roomPrice,
+                    Quantity = 1
+                };
+
+                roomItemModel.PropertyChanged += Service_PropertyChanged;
+                Services.Insert(0, roomItemModel);
+            }
+        }
+
+        private void LoadExistingServiceUsages()
+        {
+            using (var db = new AppDbContext())
+            {
+                var usages = db.ServiceUsage
+                    .Where(s => s.CID == CurrentCustomerId && s.IID == CurrentInvoiceId)
+                    .ToList();
+
+                foreach (var usage in usages)
+                {
+                    var matched = Services.FirstOrDefault(s => s.ServiceID == usage.SID);
+                    if (matched != null)
+                    {
+                        matched.Quantity = usage.Quantity;
+                    }
                 }
             }
-            TotalAmount = total;
+        }
+
+        private void Service_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ServiceModel.Quantity))
+            {
+                lastChangedService = sender as ServiceModel;
+                saveDelayTimer.Stop();
+                saveDelayTimer.Start();
+
+                FilterServices();
+                CalculateTotalPrice();
+            }
+        }
+
+        private void SaveOrUpdateServiceUsage(ServiceModel service)
+        {
+            if (service.ServiceID == -999) return;
+
+            if (CurrentCustomerId == 0 || CurrentInvoiceId == 0)
+            {
+                Debug.WriteLine("[Save] Skipped because CID or IID = 0");
+                return;
+            }
+
+            Debug.WriteLine($"[Save] {service.ServiceName}: Qty={service.Quantity}, CID={CurrentCustomerId}, IID={CurrentInvoiceId}");
+
+            using (var db = new AppDbContext())
+            {
+                var existing = db.ServiceUsage.FirstOrDefault(s =>
+                    s.CID == CurrentCustomerId &&
+                    s.IID == CurrentInvoiceId &&
+                    s.SID == service.ServiceID);
+
+                if (existing != null)
+                {
+                    if (service.Quantity == 0)
+                        db.ServiceUsage.Remove(existing);
+                    else
+                    {
+                        existing.Quantity = service.Quantity;
+                        existing.ServiceTotal = service.TotalAmount;
+                        db.ServiceUsage.Update(existing);
+                    }
+                }
+                else if (service.Quantity > 0)
+                {
+                    db.ServiceUsage.Add(new ServiceUsage
+                    {
+                        SID = service.ServiceID,
+                        CID = CurrentCustomerId,
+                        IID = CurrentInvoiceId,
+                        Quantity = service.Quantity,
+                        ServiceTotal = service.TotalAmount
+                    });
+                }
+
+                db.SaveChanges();
+            }
+            CalculateTotalPrice();
+        }
+
+        public void FilterServices()
+        {
+            var cvs = new CollectionViewSource { Source = Services };
+            cvs.Filter += (s, e) =>
+            {
+                if (e.Item is ServiceModel service)
+                    e.Accepted = service.Quantity > 0 || service.ServiceID == -999;
+            };
+            FilteredServices = cvs.View;
+        }
+
+        public void CalculateTotalPrice()
+        {
+            decimal total = Services
+                .Where(s => s.Quantity > 0 || s.ServiceID == -999)
+                .Sum(s => s.TotalAmount);
+
+            TotalPrice = total;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
-
 }

@@ -1,5 +1,7 @@
-﻿using HotelManagementApp.Models;
+﻿using HotelManagementApp.Database;
+using HotelManagementApp.Models;
 using HotelManagementApp.ViewModels;
+using System.Linq;
 using System.Windows;
 
 namespace HotelManagementApp.Views.Dialogs
@@ -11,23 +13,28 @@ namespace HotelManagementApp.Views.Dialogs
         public CheckOutDialog(RoomModel room)
         {
             InitializeComponent();
-            _room = room;
+
+            var vm = new CheckOutDialogViewModel();
+            vm.InitializeByRoomId(room.RID); // Chỉ dùng room.RID
+            this.DataContext = vm;
         }
 
-        // Khi nhấn nút Confirm, tính tổng và đóng cửa sổ
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             var vm = (CheckOutDialogViewModel)this.DataContext;
-            vm.CalculateTotalAmount();  // Tính tổng tiền
-            this.DialogResult = true;   // Đóng cửa sổ và trả lại kết quả
+            vm.CalculateTotalPrice();
+            this.DialogResult = true;
             this.Close();
         }
 
-        // Khi nhấn nút Cancel, đóng cửa sổ mà không làm gì
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;
             this.Close();
+        }
+
+        private void DataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
         }
     }
 }
