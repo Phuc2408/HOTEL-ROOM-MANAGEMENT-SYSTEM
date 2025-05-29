@@ -41,6 +41,7 @@ namespace HotelManagementApp.ViewModels
 
         public int CurrentCustomerId { get; set; }
         public int CurrentInvoiceId { get; set; }
+        public int CurrentRoomId { get; set; } 
 
         private DispatcherTimer saveDelayTimer;
         private ServiceModel lastChangedService;
@@ -67,8 +68,8 @@ namespace HotelManagementApp.ViewModels
                 var rent = db.Rent.FirstOrDefault(r => r.RID == roomId);
                 if (rent == null) return;
 
-                var invoice = db.Invoice.FirstOrDefault(i => i.RelID == rent.RelID);
-                if (invoice == null) return;
+                var customer = db.Customer.FirstOrDefault(c => c.CID == rent.CID);
+                if (customer == null) return;
 
                 var room = db.Room.FirstOrDefault(r => r.RID == roomId);
                 if (room == null) return;
@@ -76,7 +77,25 @@ namespace HotelManagementApp.ViewModels
                 roomPrice = room.RPrice;
                 roomType = room.RType;
 
+                CurrentRoomId = roomId;
                 CurrentCustomerId = rent.CID;
+
+                var invoice = db.Invoice.FirstOrDefault(i => i.RelID == rent.RelID);
+                if (invoice == null)
+                {
+                    invoice = new Invoice
+                    {
+                        CID = rent.CID,
+                        RelID = rent.RelID,
+                        IDate = DateTime.Now,
+                        RoomTotal = roomPrice,
+                        ServiceTotal = 0,
+                        Total = roomPrice
+                    };
+                    db.Invoice.Add(invoice);
+                    db.SaveChanges();
+                }
+
                 CurrentInvoiceId = invoice.IID;
             }
 
@@ -85,7 +104,39 @@ namespace HotelManagementApp.ViewModels
             FilterServices();
             CalculateTotalPrice();
         }
+        public bool SetRoomStatusToCleaning()
+        {
+            if (this.CurrentRoomId == 0)
+            {
+                Debug.WriteLine("[SetRoomStatus] Lỗi: CurrentRoomId chưa được thiết lập.");
+                // Có thể throw exception hoặc thông báo lỗi cụ thể hơn nếu cần
+                return false;
+            }
 
+            using (var db = new AppDbContext())
+            {
+                var room = db.Room.FirstOrDefault(r => r.RID == this.CurrentRoomId);
+                if (room == null)
+                {
+                    Debug.WriteLine($"[SetRoomStatus] Lỗi: Không tìm thấy phòng với RID: {this.CurrentRoomId}.");
+                    return false;
+                }
+                room.RStatus = "cleaning";
+
+                try
+                {
+                    db.SaveChanges();
+                    Debug.WriteLine($"[SetRoomStatus] Đã cập nhật thành công trạng thái phòng RID: {this.CurrentRoomId} thành 'Cleaning'.");
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[SetRoomStatus] Lỗi khi lưu thay đổi trạng thái phòng cho RID {this.CurrentRoomId}: {ex.Message}");
+                    // Ghi log chi tiết lỗi ex
+                    return false;
+                }
+            }
+        }
         private void SaveDelayTimer_Tick(object sender, EventArgs e)
         {
             saveDelayTimer.Stop();
