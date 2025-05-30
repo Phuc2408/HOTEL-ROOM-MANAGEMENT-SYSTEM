@@ -69,6 +69,8 @@ namespace HotelManagementApp.Views
             if (dialog.ShowDialog() == true)
             {
                 room.Status = "cleaning";
+                room.GuestName = null;
+                room.CheckInDate = null;
             }
         }
 
