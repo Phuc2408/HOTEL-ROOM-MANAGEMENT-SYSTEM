@@ -304,7 +304,6 @@ namespace HotelManagementApp.ViewModels
                         RoomTotal = this.roomPrice,
                         ServiceTotal = 0,
                         Total = this.roomPrice,
-                        // Nếu có thêm field Status thì gán ở đây (ví dụ: Status = "Draft")
                     };
                     db.Invoice.Add(invoiceRecord);
                     try
@@ -435,7 +434,7 @@ namespace HotelManagementApp.ViewModels
                     Debug.WriteLine($"[SetRoomStatus] Không tìm thấy Room RID={this.CurrentRoomId}");
                     return false;
                 }
-                room.RStatus = "Cleaning";
+                room.RStatus = "cleaning";
                 try
                 {
                     db.SaveChanges();
