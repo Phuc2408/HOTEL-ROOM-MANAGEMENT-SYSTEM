@@ -1,6 +1,9 @@
-﻿using HotelManagementApp.Helpers;
+﻿using HotelManagementApp.Database; // để dùng AppDbContext
+using HotelManagementApp.Helpers;
+using HotelManagementApp.Models;   // nếu cần RoomModel
 using HotelManagementApp.ViewModels;
 using System;
+using System.Linq;
 using System.Windows;
 
 namespace HotelManagementApp.Views.Dialogs
@@ -72,8 +75,46 @@ namespace HotelManagementApp.Views.Dialogs
         {
             if (this.DataContext is CheckInDialogViewModel vm)
             {
-                vm.IsRepairRequested = true;
-                this.DialogResult = true;
+                int rid = vm.RoomIdInt;
+                bool updateSuccess = false;
+
+                try
+                {
+                    using (var db = new AppDbContext())
+                    {
+                        var roomEntity = db.Room.FirstOrDefault(r => r.RID == rid);
+                        if (roomEntity != null)
+                        {
+                            roomEntity.RStatus = "repairing";
+                            db.SaveChanges();
+                            updateSuccess = true;
+                            // Nếu dùng RoomModel trong ViewModel, bạn có thể cập nhật thêm:
+                            // roomModel.Status = "Repairing";
+                            // roomModel.GuestName = null;
+                            // roomModel.CheckInDate = null;
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Không tìm thấy phòng RID {rid} trong cơ sở dữ liệu.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Lỗi khi cập nhật trạng thái phòng: {ex.Message}", "Lỗi CSDL", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                if (updateSuccess)
+                {
+                    MessageBox.Show($"Phòng RID {rid} đã được chuyển sang trạng thái “Repairing”.", "Thành Công", MessageBoxButton.OK, MessageBoxImage.Information);
+                    vm.IsRepairRequested = true;
+                    this.DialogResult = true;
+                }
+                else
+                {
+                    this.DialogResult = false;
+                }
+
                 this.Close();
             }
         }
