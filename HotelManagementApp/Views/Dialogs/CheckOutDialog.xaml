@@ -65,7 +65,7 @@
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                      materialDesign:HintAssist.Hint="Room"
                                      IsReadOnly="True"
-                                     Text="{Binding RoomId}" />
+                                     Text="{Binding RoomNumber}" />
                             <TextBox Grid.Row="2" Grid.Column="1" Margin="5"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                      materialDesign:HintAssist.Hint="Number of people"

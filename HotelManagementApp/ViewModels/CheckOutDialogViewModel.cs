@@ -13,6 +13,126 @@ namespace HotelManagementApp.ViewModels
 {
     public class CheckOutDialogViewModel : INotifyPropertyChanged
     {
+        // ============================
+        // 1. Các property hiển thị lên dialog
+        // ============================
+
+        private string _guestName;
+        public string GuestName
+        {
+            get => _guestName;
+            set
+            {
+                if (_guestName != value)
+                {
+                    _guestName = value;
+                    OnPropertyChanged(nameof(GuestName));
+                }
+            }
+        }
+
+        private string _idCard;
+        public string IdCard
+        {
+            get => _idCard;
+            set
+            {
+                if (_idCard != value)
+                {
+                    _idCard = value;
+                    OnPropertyChanged(nameof(IdCard));
+                }
+            }
+        }
+
+        private string _phoneNumber;
+        public string PhoneNumber
+        {
+            get => _phoneNumber;
+            set
+            {
+                if (_phoneNumber != value)
+                {
+                    _phoneNumber = value;
+                    OnPropertyChanged(nameof(PhoneNumber));
+                }
+            }
+        }
+
+        private string _selectedCountry;
+        public string SelectedCountry
+        {
+            get => _selectedCountry;
+            set
+            {
+                if (_selectedCountry != value)
+                {
+                    _selectedCountry = value;
+                    OnPropertyChanged(nameof(SelectedCountry));
+                }
+            }
+        }
+
+        private string _roomNumber;
+        public string RoomNumber
+        {
+            get => _roomNumber;
+            set
+            {
+                if (_roomNumber != value)
+                {
+                    _roomNumber = value;
+                    OnPropertyChanged(nameof(RoomNumber));
+                }
+            }
+        }
+
+        private int _peopleCount;
+        public int PeopleCount
+        {
+            get => _peopleCount;
+            set
+            {
+                if (_peopleCount != value)
+                {
+                    _peopleCount = value;
+                    OnPropertyChanged(nameof(PeopleCount));
+                }
+            }
+        }
+
+        private DateTime? _checkInDate;
+        public DateTime? CheckInDate
+        {
+            get => _checkInDate;
+            set
+            {
+                if (_checkInDate != value)
+                {
+                    _checkInDate = value;
+                    OnPropertyChanged(nameof(CheckInDate));
+                }
+            }
+        }
+
+        private DateTime? _checkOutDate;
+        public DateTime? CheckOutDate
+        {
+            get => _checkOutDate;
+            set
+            {
+                if (_checkOutDate != value)
+                {
+                    _checkOutDate = value;
+                    OnPropertyChanged(nameof(CheckOutDate));
+                }
+            }
+        }
+
+        // ============================
+        // 2. Danh sách hết dịch vụ + room
+        // ============================
+
         public ObservableCollection<ServiceModel> Services { get; set; }
 
         private ICollectionView filteredServices;
@@ -40,9 +160,13 @@ namespace HotelManagementApp.ViewModels
             }
         }
 
+        // ============================
+        // 3. Các biến luồng dữ liệu và trạng thái nội bộ
+        // ============================
+
         public int CurrentCustomerId { get; set; }
         public int CurrentInvoiceId { get; set; }
-        public int CurrentRoomId { get; set; } 
+        public int CurrentRoomId { get; set; }
 
         private DispatcherTimer saveDelayTimer;
         private ServiceModel lastChangedService;
@@ -50,14 +174,15 @@ namespace HotelManagementApp.ViewModels
         private decimal roomPrice;
         private string roomType;
         private ServiceModel roomItemModel;
-        // ===== KHAI BÁO BIẾN MỚI Ở ĐÂY =====
-        private int activeRelID_forCheckout; // Trường để lưu RelID của Rent record đang được checkout
 
-        private bool _canPerformCheckout; // Trường private cho thuộc tính CanPerformCheckout
+        // Trường để lưu RelID (bản ghi Rent chưa có Invoice) 
+        private int activeRelID_forCheckout;
+
+        private bool _canPerformCheckout;
         public bool CanPerformCheckout
         {
             get => _canPerformCheckout;
-            private set // Nên là private set để chỉ ViewModel này quản lý
+            private set
             {
                 if (_canPerformCheckout != value)
                 {
@@ -66,7 +191,10 @@ namespace HotelManagementApp.ViewModels
                 }
             }
         }
-        // ===== KẾT THÚC KHAI BÁO BIẾN MỚI =====
+
+        // ============================
+        // Constructor
+        // ============================
         public CheckOutDialogViewModel()
         {
             saveDelayTimer = new DispatcherTimer
@@ -78,31 +206,40 @@ namespace HotelManagementApp.ViewModels
             Services = new ObservableCollection<ServiceModel>();
         }
 
+        /// <summary>
+        /// Phương thức khởi tạo và load dữ liệu dựa trên roomId được truyền vào
+        /// </summary>
+        /// <param name="roomId"></param>
         public void InitializeByRoomId(int roomId)
         {
             this.CurrentRoomId = roomId;
-            this.Services.Clear(); // Xóa dịch vụ từ lần mở trước
+            this.Services.Clear();
             this.activeRelID_forCheckout = 0;
             this.CurrentCustomerId = 0;
-            this.CurrentInvoiceId = 0; // Mặc định là chưa có Invoice ID
+            this.CurrentInvoiceId = 0;
             this.TotalPrice = 0;
             this.roomItemModel = null;
             this.CanPerformCheckout = false;
 
             using (var db = new AppDbContext())
             {
+                // 1. Lấy thông tin phòng
                 var roomDetails = db.Room.FirstOrDefault(r => r.RID == roomId);
                 if (roomDetails == null)
                 {
                     Debug.WriteLine($"[CheckOut Init] Lỗi: Không tìm thấy thông tin phòng RID: {roomId}.");
                     MessageBox.Show("Lỗi: Không tìm thấy thông tin phòng để checkout.", "Lỗi Dữ Liệu", MessageBoxButton.OK, MessageBoxImage.Error);
-                    OnPropertyChanged(nameof(CanPerformCheckout)); // Cập nhật trạng thái nút nếu có binding
+                    OnPropertyChanged(nameof(CanPerformCheckout));
                     return;
                 }
-                this.roomPrice = roomDetails.RPrice; // Gán cho biến instance để LoadServicesFromDatabase sử dụng
-                this.roomType = roomDetails.RType;   // Gán cho biến instance
 
-                // 1. Tìm bản ghi Rent đang active cho phòng này (chưa có hóa đơn)
+                this.RoomNumber = roomDetails.RID.ToString();
+                OnPropertyChanged(nameof(RoomNumber));
+
+                this.roomPrice = roomDetails.RPrice;
+                this.roomType = roomDetails.RType;
+
+                // 2. Tìm Rent đang active (chưa có Invoice) cho phòng này
                 var currentActiveRent = db.Rent
                     .Where(r => r.RID == roomId && !db.Invoice.Any(inv => inv.RelID == r.RelID))
                     .OrderByDescending(r => r.CheckInDate)
@@ -110,122 +247,153 @@ namespace HotelManagementApp.ViewModels
 
                 if (currentActiveRent == null)
                 {
-                    Debug.WriteLine($"[CheckOut Init] KHÔNG TÌM THẤY LƯỢT THUÊ ACTIVE (chưa có hóa đơn) cho Phòng ID: {roomId}.");
-                    MessageBox.Show("Phòng này không có thông tin thuê đang hoạt động (chưa thanh toán) để checkout.", "Thông Báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // Load services cơ bản và room item với giá trị 0 (nếu vẫn muốn hiển thị cấu trúc dialog)
-                    LoadServicesFromDatabase(); // roomItemModel.Quantity sẽ là 0 do activeRelID_forCheckout = 0
+                    Debug.WriteLine($"[CheckOut Init] KHÔNG TÌM THẤY RENT ACTIVE cho Room ID: {roomId}.");
+                    MessageBox.Show("Phòng này không có lượt thuê đang hoạt động (chưa thanh toán) để checkout.", "Thông Báo", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Vẫn load Services (chỉ có roomItemModel với Quantity = 0)
+                    LoadServicesFromDatabase();
                     FilterServices();
                     CalculateTotalPrice();
                     OnPropertyChanged(nameof(CanPerformCheckout));
                     return;
                 }
 
-                // Lưu lại thông tin quan trọng của lượt Rent sẽ được checkout
+                // Lưu RelID và CustomerId của Rent đó
                 this.activeRelID_forCheckout = currentActiveRent.RelID;
                 this.CurrentCustomerId = currentActiveRent.CID;
 
-                // 2. Kiểm tra xem có hóa đơn nào (do lỗi logic/đồng bộ trước đó) đã tồn tại cho Rent này không.
-                // Theo định nghĩa currentActiveRent thì không nên có.
-                var invoiceRecord = db.Invoice.FirstOrDefault(i => i.RelID == this.activeRelID_forCheckout);
+                // 3. Load thông tin Customer (khách hàng) từ bảng Customer
+                var customer = db.Customer.FirstOrDefault(c => c.CID == currentActiveRent.CID);
+                if (customer != null)
+                {
+                    this.GuestName = customer.CName;  
+                    this.IdCard = customer.CPersonalID;
+                    this.PhoneNumber = customer.CPhone;
+                    this.SelectedCountry = customer.CCountry;
+                }
+                else
+                {
+                    Debug.WriteLine($"[CheckOut Init] Lỗi: Không tìm thấy Customer CID: {currentActiveRent.CID}");
+                    MessageBox.Show("Lỗi: Không tìm thấy thông tin khách hàng.", "Lỗi Dữ Liệu", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                OnPropertyChanged(nameof(GuestName));
+                OnPropertyChanged(nameof(IdCard));
+                OnPropertyChanged(nameof(PhoneNumber));
+                OnPropertyChanged(nameof(SelectedCountry));
 
+                // 4. Gán thông tin ngày và số người
+                this.PeopleCount = currentActiveRent.NumberOfPeople;      // Số lượng người
+                this.CheckInDate = currentActiveRent.CheckInDate;      // Ngày Check-in
+                this.CheckOutDate = currentActiveRent.CheckOutDate;    // Ngày Check-out (có thể null nếu chưa có)
+
+                OnPropertyChanged(nameof(PeopleCount));
+                OnPropertyChanged(nameof(CheckInDate));
+                OnPropertyChanged(nameof(CheckOutDate));
+
+                // 5. Kiểm tra Invoice đã tồn tại chưa
+                var invoiceRecord = db.Invoice.FirstOrDefault(i => i.RelID == this.activeRelID_forCheckout);
                 if (invoiceRecord == null)
                 {
-                    // CHƯA CÓ HÓA ĐƠN => TẠO MỘT HÓA ĐƠN NHÁP NGAY BÂY GIỜ
-                    // để ServiceUsage có thể được lưu với IID này trong quá trình người dùng thao tác trên dialog.
-                    Debug.WriteLine($"[CheckOut Init] Chưa có hóa đơn cho lượt thuê active (RelID: {this.activeRelID_forCheckout}). Tạo hóa đơn nháp.");
+                    // CHƯA CÓ HÓA ĐƠN → TẠO HÓA ĐƠN NHÁP
+                    Debug.WriteLine($"[CheckOut Init] Tạo Invoice nháp cho RelID: {this.activeRelID_forCheckout}");
                     invoiceRecord = new Invoice
                     {
-                        CID = this.CurrentCustomerId, // Lấy từ currentActiveRent
+                        CID = this.CurrentCustomerId,
                         RelID = this.activeRelID_forCheckout,
-                        IDate = DateTime.Now.Date, // Ngày tạo hóa đơn nháp
-                        RoomTotal = this.roomPrice, // Tiền phòng ban đầu
+                        IDate = DateTime.Now.Date,
+                        RoomTotal = this.roomPrice,
                         ServiceTotal = 0,
                         Total = this.roomPrice,
-                        // Bạn có thể thêm một trường Status cho Invoice, ví dụ: "Draft"
-                        // Status = "Draft"
+                        // Nếu có thêm field Status thì gán ở đây (ví dụ: Status = "Draft")
                     };
                     db.Invoice.Add(invoiceRecord);
                     try
                     {
-                        db.SaveChanges(); // Lưu hóa đơn nháp để lấy IID
-                        this.CurrentInvoiceId = invoiceRecord.IID; // Lấy IID của hóa đơn vừa tạo
-                        Debug.WriteLine($"[CheckOut Init] Hóa đơn nháp (IID: {this.CurrentInvoiceId}) đã được tạo cho RelID: {this.activeRelID_forCheckout}.");
+                        db.SaveChanges();
+                        this.CurrentInvoiceId = invoiceRecord.IID;
+                        Debug.WriteLine($"[CheckOut Init] Invoice nháp (IID={this.CurrentInvoiceId}) đã được tạo.");
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"[CheckOut Init] Lỗi khi tạo hóa đơn nháp: {ex.Message}\n{ex.StackTrace}");
+                        Debug.WriteLine($"[CheckOut Init] Lỗi khi tạo Invoice nháp: {ex.Message}");
                         MessageBox.Show("Lỗi khi khởi tạo thông tin thanh toán. Vui lòng thử lại.", "Lỗi Hệ Thống", MessageBoxButton.OK, MessageBoxImage.Error);
                         OnPropertyChanged(nameof(CanPerformCheckout));
-                        return; // Không thể tiếp tục nếu không tạo được hóa đơn nháp
+                        return;
                     }
                 }
                 else
                 {
-                    // Đã có hóa đơn (trường hợp bất thường hoặc đang chỉnh sửa hóa đơn đã có từ trước)
-                    Debug.WriteLine($"[CheckOut Init] Đã tìm thấy hóa đơn (IID: {invoiceRecord.IID}) cho lượt thuê (RelID: {this.activeRelID_forCheckout}). Sẽ tải hóa đơn này.");
+                    // ĐÃ CÓ HÓA ĐƠN từ trước → Load lại ServiceUsage
+                    Debug.WriteLine($"[CheckOut Init] Tải Invoice (IID={invoiceRecord.IID}) đã tồn tại cho RelID: {this.activeRelID_forCheckout}");
                     this.CurrentInvoiceId = invoiceRecord.IID;
-                    LoadExistingServiceUsages(); // Tải các dịch vụ đã dùng cho hóa đơn này
+                    LoadExistingServiceUsages();
                 }
-            } // Kết thúc using (var db = new AppDbContext())
+            } // Kết thúc using AppDbContext()
 
-            // Load tất cả các loại dịch vụ và tạo roomItemModel
-            // LoadServicesFromDatabase nên được gọi sau khi this.roomPrice và this.roomType đã có giá trị
+            // 6. Load toàn bộ các dịch vụ và thêm roomItemModel
             LoadServicesFromDatabase();
 
-            // Nếu CurrentInvoiceId != 0 (tức là invoice đã tồn tại HOẶC vừa được tạo nháp và có IID),
-            // LoadExistingServiceUsages có thể được gọi (nếu chưa gọi ở trên).
-            // Tuy nhiên, nếu là hóa đơn nháp mới tạo, nó sẽ không có service usage nào.
-            // Việc gọi LoadExistingServiceUsages sau khi tạo nháp chủ yếu để đảm bảo code nhất quán.
-
+            // 7. Lọc ra các dịch vụ đã có quantity > 0 (bao gồm cả roomItemModel nếu quantity > 0)
             FilterServices();
+
+            // 8. Tính tổng giá 
             CalculateTotalPrice();
-            this.CanPerformCheckout = (this.activeRelID_forCheckout != 0); // Cho phép checkout nếu có active rent
+
+            // 9. Cho phép nút Confirm chỉ khi Rent đang active (activeRelID_forCheckout != 0)
+            this.CanPerformCheckout = (this.activeRelID_forCheckout != 0);
             OnPropertyChanged(nameof(CanPerformCheckout));
         }
-        // Trong CheckOutDialogViewModel.cs
+
+        /// <summary>
+        /// Thực hiện lưu thông tin thanh toán khi người dùng bấm Confirm
+        /// (gọi trực tiếp từ code‐behind hoặc command)
+        /// </summary>
+        /// <returns></returns>
         public bool PerformCheckout()
         {
             if (!CanPerformCheckout || this.activeRelID_forCheckout == 0 || this.CurrentInvoiceId == 0)
             {
-                Debug.WriteLine("[PerformCheckout] Checkout không thể thực hiện: thiếu thông tin Rent hoặc Invoice ID.");
-                MessageBox.Show("Không thể thực hiện checkout. Thông tin khởi tạo không đầy đủ.", "Lỗi Checkout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Debug.WriteLine("[PerformCheckout] Thiếu dữ liệu để checkout.");
+                MessageBox.Show("Không thể thực hiện checkout. Thông tin không đầy đủ.", "Lỗi Checkout", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
+            // Nếu timer vẫn đang chạy → dừng và lưu service cuối cùng
             if (saveDelayTimer.IsEnabled)
             {
                 saveDelayTimer.Stop();
-                if (lastChangedService != null) SaveOrUpdateServiceUsage(lastChangedService);
+                if (lastChangedService != null)
+                    SaveOrUpdateServiceUsage(lastChangedService);
             }
             CalculateTotalPrice();
 
             using (var db = new AppDbContext())
             {
-                // Tìm hóa đơn đã được tạo nháp (hoặc đã có) để hoàn tất
+                // 1. Tìm Invoice từ CSDL
                 var invoiceToFinalize = db.Invoice.FirstOrDefault(i => i.IID == this.CurrentInvoiceId);
-
                 if (invoiceToFinalize == null)
                 {
-                    Debug.WriteLine($"[PerformCheckout] Lỗi nghiêm trọng: Không tìm thấy hóa đơn nháp với IID: {this.CurrentInvoiceId}.");
-                    MessageBox.Show("Lỗi: Không tìm thấy thông tin hóa đơn để hoàn tất checkout.", "Lỗi Dữ Liệu", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Debug.WriteLine($"[PerformCheckout] Invoice (IID={this.CurrentInvoiceId}) không tồn tại.");
+                    MessageBox.Show("Lỗi: Không tìm thấy hóa đơn để hoàn tất checkout.", "Lỗi Dữ Liệu", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
 
-                // Cập nhật hóa đơn với thông tin cuối cùng
+                // 2. Cập nhật tổng tiền
                 invoiceToFinalize.RoomTotal = this.roomItemModel?.TotalAmount ?? 0;
                 invoiceToFinalize.ServiceTotal = Math.Max(0, this.TotalPrice - (this.roomItemModel?.TotalAmount ?? 0));
                 invoiceToFinalize.Total = this.TotalPrice;
-                // Nếu có trường Status trong Invoice:
-                // invoiceToFinalize.Status = "Finalized";
+                // Nếu có trường Status trong Invoice, ví dụ: Status = "Finalized";
 
-                var rentToUpdate = db.Rent.FirstOrDefault(r => r.RelID == invoiceToFinalize.RelID); // Lấy Rent từ RelID của Invoice
+                // 3. Cập nhật rent → đặt CheckOutDate + CheckOutTime
+                var rentToUpdate = db.Rent.FirstOrDefault(r => r.RelID == invoiceToFinalize.RelID);
                 if (rentToUpdate != null)
                 {
                     rentToUpdate.CheckOutDate = DateTime.Now.Date;
                     rentToUpdate.CheckOutTime = DateTime.Now.TimeOfDay;
                 }
 
-                var roomToUpdate = db.Room.FirstOrDefault(r => r.RID == this.CurrentRoomId); // Hoặc rentToUpdate.RID
+                // 4. Cập nhật trạng thái phòng thành Cleaning
+                var roomToUpdate = db.Room.FirstOrDefault(r => r.RID == this.CurrentRoomId);
                 if (roomToUpdate != null)
                 {
                     roomToUpdate.RStatus = "Cleaning";
@@ -234,23 +402,28 @@ namespace HotelManagementApp.ViewModels
                 try
                 {
                     db.SaveChanges();
-                    Debug.WriteLine($"[PerformCheckout] Checkout thành công. Hóa đơn (IID: {invoiceToFinalize.IID}) đã được hoàn tất/cập nhật.");
+                    Debug.WriteLine($"[PerformCheckout] Checkout thành công cho IID={invoiceToFinalize.IID}.");
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[PerformCheckout] Lỗi khi lưu các thay đổi checkout: {ex.Message}\n{ex.StackTrace}");
-                    MessageBox.Show($"Lỗi khi lưu thông tin checkout: {ex.Message}", "Lỗi Cơ Sở Dữ Liệu", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Debug.WriteLine($"[PerformCheckout] Lỗi khi lưu CSDL: {ex.Message}");
+                    MessageBox.Show($"Lỗi khi lưu thông tin checkout: {ex.Message}", "Lỗi CSDL", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
             }
         }
+
+        /// <summary>
+        /// Nếu muốn đổi trạng thái phòng thành "Cleaning" riêng lẻ (không chạy PerformCheckout),
+        /// bạn có thể gọi phương thức này.
+        /// </summary>
+        /// <returns></returns>
         public bool SetRoomStatusToCleaning()
         {
             if (this.CurrentRoomId == 0)
             {
-                Debug.WriteLine("[SetRoomStatus] Lỗi: CurrentRoomId chưa được thiết lập.");
-                // Có thể throw exception hoặc thông báo lỗi cụ thể hơn nếu cần
+                Debug.WriteLine("[SetRoomStatus] CurrentRoomId = 0.");
                 return false;
             }
 
@@ -259,25 +432,28 @@ namespace HotelManagementApp.ViewModels
                 var room = db.Room.FirstOrDefault(r => r.RID == this.CurrentRoomId);
                 if (room == null)
                 {
-                    Debug.WriteLine($"[SetRoomStatus] Lỗi: Không tìm thấy phòng với RID: {this.CurrentRoomId}.");
+                    Debug.WriteLine($"[SetRoomStatus] Không tìm thấy Room RID={this.CurrentRoomId}");
                     return false;
                 }
-                room.RStatus = "cleaning";
-
+                room.RStatus = "Cleaning";
                 try
                 {
                     db.SaveChanges();
-                    Debug.WriteLine($"[SetRoomStatus] Đã cập nhật thành công trạng thái phòng RID: {this.CurrentRoomId} thành 'Cleaning'.");
+                    Debug.WriteLine($"[SetRoomStatus] Cập nhật RStatus=Cleaning cho RID={this.CurrentRoomId}.");
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[SetRoomStatus] Lỗi khi lưu thay đổi trạng thái phòng cho RID {this.CurrentRoomId}: {ex.Message}");
-                    // Ghi log chi tiết lỗi ex
+                    Debug.WriteLine($"[SetRoomStatus] Lỗi lưu CSDL: {ex.Message}");
                     return false;
                 }
             }
         }
+
+        // ============================
+        // 4. Các hàm nội bộ để load & lưu ServiceUsage
+        // ============================
+
         private void SaveDelayTimer_Tick(object sender, EventArgs e)
         {
             saveDelayTimer.Stop();
@@ -306,6 +482,7 @@ namespace HotelManagementApp.ViewModels
                     Services.Add(item);
                 }
 
+                // Tạo roomItemModel (ServiceModel đại diện cho phí phòng)
                 roomItemModel = new ServiceModel
                 {
                     ServiceID = -999,
@@ -314,7 +491,6 @@ namespace HotelManagementApp.ViewModels
                     UnitPrice = roomPrice,
                     Quantity = 1
                 };
-
                 roomItemModel.PropertyChanged += Service_PropertyChanged;
                 Services.Insert(0, roomItemModel);
             }
@@ -358,7 +534,7 @@ namespace HotelManagementApp.ViewModels
 
             if (CurrentCustomerId == 0 || CurrentInvoiceId == 0)
             {
-                Debug.WriteLine("[Save] Skipped because CID or IID = 0");
+                Debug.WriteLine("[Save] Bỏ qua vì CID hoặc IID = 0");
                 return;
             }
 
@@ -419,8 +595,11 @@ namespace HotelManagementApp.ViewModels
             TotalPrice = total;
         }
 
+        // ============================
+        // 5. INotifyPropertyChanged
+        // ============================
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string name) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        protected void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

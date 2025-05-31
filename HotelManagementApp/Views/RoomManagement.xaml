@@ -27,7 +27,7 @@
             <RowDefinition Height="*"/>
             <!-- Layout -->
         </Grid.RowDefinitions>
-        
+
         <!--  TIÊU ĐỀ -->
         <TextBlock Grid.Row="0"
                Text="Room Management"
@@ -40,21 +40,21 @@
 
             <DockPanel LastChildFill="False" VerticalAlignment="Center">
 
-            <!-- 📅 Ngày hôm nay -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
-                <materialDesign:PackIcon Kind="CalendarToday" Width="20" Height="20" Margin="0,0,5,0"/>
-                <TextBlock Text="{Binding CurrentDateString}"
+                <!-- 📅 Ngày hôm nay -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <materialDesign:PackIcon Kind="CalendarToday" Width="20" Height="20" Margin="0,0,5,0"/>
+                    <TextBlock Text="{Binding CurrentDateString}"
                    FontSize="14"
                    FontWeight="SemiBold"
                    VerticalAlignment="Center"/>
-            </StackPanel>
+                </StackPanel>
 
-            <!-- 🔍 Search -->
-            <TextBox Width="200" Margin="0,0,10,0"
+                <!-- 🔍 Search -->
+                <TextBox Width="200" Margin="0,0,10,0"
              materialDesign:HintAssist.Hint="Search..."
              VerticalAlignment="Center"/>
 
-            <!-- 🔽 Sort -->
+                <!-- 🔽 Sort -->
                 <ComboBox Width="150" Margin="0,0,10,0"
               VerticalAlignment="Center"
               materialDesign:HintAssist.Hint="Sort">
