@@ -38,6 +38,9 @@ namespace HotelManagementApp.Views
                     case "cleaning":
                         ShowCleaningDoneDialog(room);
                         break;
+                    case "repairing":
+                        ShowRepairingDialog(room);
+                        break;
                 }
             }
         }
@@ -89,7 +92,65 @@ namespace HotelManagementApp.Views
 
 
             var result = MessageBox.Show($"Xác nhận phòng [{roomIdentifier}] đã dọn dẹp xong và sẵn sàng?",
-                                         "Xác Nhận Hoàn Tất Dọn Dẹp",
+                                         "Xác Nhận Hoàn Tất",
+                                         MessageBoxButton.YesNo,
+                                         MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                bool updateSuccess = false;
+                try
+                {
+                    using (var db = new AppDbContext()) // Khởi tạo DbContext
+                    {
+                        var roomEntityInDb = db.Room.FirstOrDefault(r => r.RID == room.RID);
+
+                        if (roomEntityInDb != null)
+                        {
+                            roomEntityInDb.RStatus = "available";
+                            db.SaveChanges();
+                            updateSuccess = true;
+                            Debug.WriteLine($"Đã cập nhật trạng thái phòng RID {room.RID} thành 'Available' trong DB.");
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Không tìm thấy phòng [{roomIdentifier}] trong cơ sở dữ liệu.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Lỗi khi cập nhật phòng RID {room.RID} xuống DB: {ex.Message}");
+                    MessageBox.Show($"Đã xảy ra lỗi khi cập nhật trạng thái phòng: {ex.Message}", "Lỗi Cơ Sở Dữ Liệu", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                if (updateSuccess)
+                {
+                    room.Status = "available";
+                    room.GuestName = null;
+                    room.CheckInDate = null;
+
+                }
+                // Nếu updateSuccess là false, các thông báo lỗi đã được hiển thị.
+            }
+        }
+
+        private void ShowRepairingDialog(RoomModel room)
+        {
+            if (room == null)
+            {
+                MessageBox.Show("Lỗi: Thông tin phòng không hợp lệ.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Sử dụng một thuộc tính dễ nhận biết của phòng để hiển thị, ví dụ room.RoomNumber hoặc room.RID
+            string roomIdentifier = room.RID.ToString(); // Hoặc một thuộc tính tên phòng nếu có, ví dụ room.RType + room.RID 
+                                                         // Bạn cần một cách để xác định phòng trong thông báo
+                                                         // Ví dụ: if (room.RoomNumberProperty != null) roomIdentifier = room.RoomNumberProperty;
+
+
+            var result = MessageBox.Show($"Xác nhận phòng [{roomIdentifier}] đã sửa xong và sẵn sàng?",
+                                         "Xác Nhận Hoàn Tất",
                                          MessageBoxButton.YesNo,
                                          MessageBoxImage.Question);
 
@@ -132,5 +193,4 @@ namespace HotelManagementApp.Views
             }
         }
     }
-        
 }
