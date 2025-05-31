@@ -62,7 +62,6 @@
 
                 <!-- Nút chọn thời gian -->
                 <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top" Margin="10,40,0,0">
-                    <Button Content="Today" Command="{Binding ChangeModeCommand}" CommandParameter="Today" Margin="5"/>
                     <Button Content="Week" Command="{Binding ChangeModeCommand}" CommandParameter="Week" Margin="5"/>
                     <Button Content="Month" Command="{Binding ChangeModeCommand}" CommandParameter="Month" Margin="5"/>
                     <Button Content="Year" Command="{Binding ChangeModeCommand}" CommandParameter="Year" Margin="5"/>
