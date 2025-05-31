@@ -9,39 +9,7 @@ namespace HotelManagementApp.Helpers
         private readonly string connectionString = "Server=(LocalDB)\\MSSQLLocalDB;Integrated Security=True;";
 
 
-        // Hàm duy nhất để tạo hóa đơn hoàn chỉnh
-        public bool CreateInvoice(int customerId, int rentId)
-        {
-            try
-            {
-                decimal roomTotal = CalculateRoomTotal(rentId);
-                decimal serviceTotal = CalculateServiceTotal(customerId);
-                decimal total = roomTotal + serviceTotal;
-
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    SqlCommand cmd = new SqlCommand("sp_AddInvoice", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@CID", customerId);
-                    cmd.Parameters.AddWithValue("@RelID", rentId);
-                    cmd.Parameters.AddWithValue("@IDate", DateTime.Today);
-                    cmd.Parameters.AddWithValue("@RoomTotal", roomTotal);
-                    cmd.Parameters.AddWithValue("@ServiceTotal", serviceTotal);
-                    cmd.Parameters.AddWithValue("@Total", total);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Lỗi khi tạo hóa đơn: " + ex.Message);
-                return false;
-            }
-        }
+        
 
         private decimal CalculateRoomTotal(int rentId)
         {

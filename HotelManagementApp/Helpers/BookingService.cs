@@ -43,25 +43,6 @@ namespace HotelManagementApp.Helpers
             }
         }
 
-        public bool CheckOut(int rentId)
-        {
-            try
-            {
-                using (var context = new AppDbContext())
-                {
-                    var rent = context.Rent.Find(rentId);
-                    if (rent == null) return false;
-
-                    rent.CheckOutTime = DateTime.Now.TimeOfDay;
-                    context.SaveChanges();
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error while checking out: " + ex.Message);
-                return false;
-            }
-        }
+        
     }
 }
