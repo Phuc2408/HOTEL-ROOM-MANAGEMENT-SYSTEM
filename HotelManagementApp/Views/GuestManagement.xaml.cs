@@ -1,5 +1,4 @@
 ﻿using HotelManagementApp.Models;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using HotelManagementApp.Views.Dialogs;
@@ -7,9 +6,6 @@ using HotelManagementApp.ViewModels;
 
 namespace HotelManagementApp.Views
 {
-    /// <summary>
-    /// Interaction logic for GuestManagement.xaml
-    /// </summary>
     public partial class GuestManagement : Page
     {
         public GuestManagement()
@@ -21,7 +17,6 @@ namespace HotelManagementApp.Views
         {
             if (DataContext is GuestManagementViewModel vm && vm.SelectedGuest != null)
             {
-                // Chuyển từ GuestModel sang GuestViewModel để chỉnh sửa
                 var guestVM = new GuestViewModel
                 {
                     CID = vm.SelectedGuest.CID,
@@ -34,8 +29,6 @@ namespace HotelManagementApp.Views
                 if (dialog.ShowDialog() == true)
                 {
                     vm.UpdateGuest(guestVM);
-                    vm.Guests.Clear();
-                    vm.LoadGuests(); // làm mới danh sách
                 }
             }
             else

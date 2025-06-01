@@ -15,34 +15,33 @@ namespace HotelManagementApp.Views
 
         private void DetailButton_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            var displayModel = button?.DataContext as InvoiceDisplayModel;
-
-            if (displayModel == null)
+            if (sender is Button button && button.DataContext is InvoiceDisplayModel displayModel)
             {
-                MessageBox.Show("Không lấy được hóa đơn.");
-                return;
-            }
-
-            using (var context = new AppDbContext())
-            {
-                // Dùng chính IID để lấy từ DB
+                using var context = new AppDbContext();
                 var invoiceEntity = context.Invoice.FirstOrDefault(i => i.IID == displayModel.IID);
 
                 if (invoiceEntity != null)
                 {
-                    this.NavigationService?.Navigate(new InvoiceDetail(invoiceEntity));
+                    NavigationService?.Navigate(new InvoiceDetail(invoiceEntity));
                 }
                 else
                 {
-                    MessageBox.Show($"Không tìm thấy hóa đơn với IID = {displayModel.IID}");
+                    MessageBox.Show(
+                        $"Không tìm thấy hóa đơn với IID = {displayModel.IID}",
+                        "Thông báo",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                 }
+            }
+            else
+            {
+                MessageBox.Show("Không thể lấy thông tin hóa đơn.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void InvoiceDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // (nếu cần xử lý chọn dòng thì thêm sau)
+            // Tùy chọn: xử lý khi chọn dòng
         }
     }
 }
