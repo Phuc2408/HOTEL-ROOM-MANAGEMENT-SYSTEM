@@ -34,7 +34,9 @@ CREATE TABLE Rent (
     CheckOutDate DATE,
     CheckInTime TIME,
     CheckOutTime TIME,
-    NumberOfPeople INT
+    NumberOfPeople INT,
+    isDone BIT DEFAULT 0
+        CHECK (isDone IN (0, 1))
 );
 
 -- TẠO BẢNG HÓA ĐƠN

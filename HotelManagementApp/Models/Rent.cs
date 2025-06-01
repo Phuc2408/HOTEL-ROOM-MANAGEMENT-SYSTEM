@@ -23,5 +23,7 @@ namespace HotelManagementApp.Models
         public TimeSpan CheckOutTime { get; set; }
 
         public int NumberOfPeople { get; set; }
+
+        public bool isDone { get; set; }
     }
 }

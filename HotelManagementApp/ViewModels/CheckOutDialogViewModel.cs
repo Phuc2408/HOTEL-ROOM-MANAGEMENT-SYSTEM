@@ -223,50 +223,48 @@ namespace HotelManagementApp.ViewModels
 
             using (var db = new AppDbContext())
             {
-                // 1. Lấy thông tin phòng
+                // 1. Lấy thông tin Room (riêng biệt)
                 var roomDetails = db.Room.FirstOrDefault(r => r.RID == roomId);
                 if (roomDetails == null)
                 {
                     Debug.WriteLine($"[CheckOut Init] Lỗi: Không tìm thấy thông tin phòng RID: {roomId}.");
                     MessageBox.Show("Lỗi: Không tìm thấy thông tin phòng để checkout.", "Lỗi Dữ Liệu", MessageBoxButton.OK, MessageBoxImage.Error);
-                    OnPropertyChanged(nameof(CanPerformCheckout));
                     return;
                 }
-
                 this.RoomNumber = roomDetails.RID.ToString();
                 OnPropertyChanged(nameof(RoomNumber));
 
                 this.roomPrice = roomDetails.RPrice;
                 this.roomType = roomDetails.RType;
 
-                // 2. Tìm Rent đang active (chưa có Invoice) cho phòng này
+                // 2. Tìm Rent active (isDone = false)
                 var currentActiveRent = db.Rent
-                    .Where(r => r.RID == roomId && !db.Invoice.Any(inv => inv.RelID == r.RelID))
+                    .Where(r => r.RID == roomId && r.isDone == false)
                     .OrderByDescending(r => r.CheckInDate)
                     .FirstOrDefault();
 
                 if (currentActiveRent == null)
                 {
                     Debug.WriteLine($"[CheckOut Init] KHÔNG TÌM THẤY RENT ACTIVE cho Room ID: {roomId}.");
-                    MessageBox.Show("Phòng này không có lượt thuê đang hoạt động (chưa thanh toán) để checkout.", "Thông Báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Phòng này không có lượt thuê đang hoạt động (chưa thanh toán) để checkout.",
+                                    "Thông Báo", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    // Vẫn load Services (chỉ có roomItemModel với Quantity = 0)
+                    // Chỉ load dịch vụ (roomItemModel + services, Q=0)
                     LoadServicesFromDatabase();
                     FilterServices();
                     CalculateTotalPrice();
-                    OnPropertyChanged(nameof(CanPerformCheckout));
                     return;
                 }
 
-                // Lưu RelID và CustomerId của Rent đó
+                // Lưu RelID và CustomerId để dùng về sau
                 this.activeRelID_forCheckout = currentActiveRent.RelID;
                 this.CurrentCustomerId = currentActiveRent.CID;
 
-                // 3. Load thông tin Customer (khách hàng) từ bảng Customer
+                // 3. Load thông tin Customer (để hiển thị GuestName, IdCard, Phone, Country)
                 var customer = db.Customer.FirstOrDefault(c => c.CID == currentActiveRent.CID);
                 if (customer != null)
                 {
-                    this.GuestName = customer.CName;  
+                    this.GuestName = customer.CName;
                     this.IdCard = customer.CPersonalID;
                     this.PhoneNumber = customer.CPhone;
                     this.SelectedCountry = customer.CCountry;
@@ -281,11 +279,10 @@ namespace HotelManagementApp.ViewModels
                 OnPropertyChanged(nameof(PhoneNumber));
                 OnPropertyChanged(nameof(SelectedCountry));
 
-                // 4. Gán thông tin ngày và số người
-                this.PeopleCount = currentActiveRent.NumberOfPeople;      // Số lượng người
-                this.CheckInDate = currentActiveRent.CheckInDate;      // Ngày Check-in
-                this.CheckOutDate = currentActiveRent.CheckOutDate;    // Ngày Check-out (có thể null nếu chưa có)
-
+                // 4. Gán ngàу và số người
+                this.PeopleCount = currentActiveRent.NumberOfPeople;
+                this.CheckInDate = currentActiveRent.CheckInDate;
+                this.CheckOutDate = currentActiveRent.CheckOutDate;
                 OnPropertyChanged(nameof(PeopleCount));
                 OnPropertyChanged(nameof(CheckInDate));
                 OnPropertyChanged(nameof(CheckOutDate));
@@ -294,7 +291,6 @@ namespace HotelManagementApp.ViewModels
                 var invoiceRecord = db.Invoice.FirstOrDefault(i => i.RelID == this.activeRelID_forCheckout);
                 if (invoiceRecord == null)
                 {
-                    // CHƯA CÓ HÓA ĐƠN → TẠO HÓA ĐƠN NHÁP
                     Debug.WriteLine($"[CheckOut Init] Tạo Invoice nháp cho RelID: {this.activeRelID_forCheckout}");
                     invoiceRecord = new Invoice
                     {
@@ -315,33 +311,39 @@ namespace HotelManagementApp.ViewModels
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"[CheckOut Init] Lỗi khi tạo Invoice nháp: {ex.Message}");
-                        MessageBox.Show("Lỗi khi khởi tạo thông tin thanh toán. Vui lòng thử lại.", "Lỗi Hệ Thống", MessageBoxButton.OK, MessageBoxImage.Error);
-                        OnPropertyChanged(nameof(CanPerformCheckout));
+                        MessageBox.Show("Lỗi khi khởi tạo thông tin thanh toán. Vui lòng thử lại.",
+                                        "Lỗi Hệ Thống", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                 }
                 else
                 {
-                    // ĐÃ CÓ HÓA ĐƠN từ trước → Load lại ServiceUsage
                     Debug.WriteLine($"[CheckOut Init] Tải Invoice (IID={invoiceRecord.IID}) đã tồn tại cho RelID: {this.activeRelID_forCheckout}");
                     this.CurrentInvoiceId = invoiceRecord.IID;
-                    LoadExistingServiceUsages();
+                    // Lưu ý: Không gọi LoadExistingServiceUsages ở đây vì Services chưa được tạo
                 }
             } // Kết thúc using AppDbContext()
 
-            // 6. Load toàn bộ các dịch vụ và thêm roomItemModel
+            // 6. BƯỚC QUAN TRỌNG: Load toàn bộ ServiceModel (roomItemModel + dịch vụ)
             LoadServicesFromDatabase();
 
-            // 7. Lọc ra các dịch vụ đã có quantity > 0 (bao gồm cả roomItemModel nếu quantity > 0)
+            // 7. Nếu đã tồn tại Invoice (CurrentInvoiceId != 0), gán Quantity cho các dịch vụ cũ
+            if (this.CurrentInvoiceId != 0)
+            {
+                LoadExistingServiceUsages();
+            }
+
+            // 8. Lọc ra những ServiceModel có Quantity > 0 (và luôn giữ roomItemModel)
             FilterServices();
 
-            // 8. Tính tổng giá 
+            // 9. Tính tổng giá
             CalculateTotalPrice();
 
-            // 9. Cho phép nút Confirm chỉ khi Rent đang active (activeRelID_forCheckout != 0)
+            // 10. Cho phép nút Confirm khi Rent active (activeRelID_forCheckout != 0)
             this.CanPerformCheckout = (this.activeRelID_forCheckout != 0);
             OnPropertyChanged(nameof(CanPerformCheckout));
         }
+
 
         /// <summary>
         /// Nếu muốn đổi trạng thái phòng thành "Cleaning" riêng lẻ (không chạy PerformCheckout),
@@ -358,6 +360,7 @@ namespace HotelManagementApp.ViewModels
 
             using (var db = new AppDbContext())
             {
+                // 1. Tìm và cập nhật Room
                 var room = db.Room.FirstOrDefault(r => r.RID == this.CurrentRoomId);
                 if (room == null)
                 {
@@ -365,10 +368,27 @@ namespace HotelManagementApp.ViewModels
                     return false;
                 }
                 room.RStatus = "cleaning";
+
+                // 2. Tìm Rent active (isDone == false) gần nhất cho phòng này
+                var activeRent = db.Rent
+                    .Where(r => r.RID == this.CurrentRoomId && r.isDone == false)
+                    .OrderByDescending(r => r.CheckInDate)
+                    .FirstOrDefault();
+
+                if (activeRent != null)
+                {
+                    activeRent.isDone = true;
+                    activeRent.CheckOutDate = DateTime.Now.Date; // nếu muốn lưu ngày checkout
+                }
+                else
+                {
+                    Debug.WriteLine($"[SetRoomStatus] Không tìm thấy Rent active cho RID={this.CurrentRoomId}.");
+                }
+
                 try
                 {
                     db.SaveChanges();
-                    Debug.WriteLine($"[SetRoomStatus] Cập nhật RStatus=Cleaning cho RID={this.CurrentRoomId}.");
+                    Debug.WriteLine($"[SetRoomStatus] Cập nhật RStatus='cleaning' và Rent.isDone=true cho RID={this.CurrentRoomId}.");
                     return true;
                 }
                 catch (Exception ex)
@@ -378,6 +398,7 @@ namespace HotelManagementApp.ViewModels
                 }
             }
         }
+
 
         // ============================
         // 4. Các hàm nội bộ để load & lưu ServiceUsage

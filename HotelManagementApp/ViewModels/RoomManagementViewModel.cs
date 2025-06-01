@@ -40,18 +40,16 @@ namespace HotelManagementApp.ViewModels
                 using (var context = new AppDbContext())
                 {
                     // Giai đoạn 1: Lấy tất cả các phòng. Đối với mỗi phòng, nếu nó đang "Occupied" (hoặc "in_use"),
-                    // tìm bản ghi Rent được coi là "active" (tức là CHƯA có Invoice).
+                    // tìm bản ghi Rent được coi là "active" (isDone = false).
                     var roomsAndPotentialRent = context.Room
                         .Select(roomEntity => new // Tạo một đối tượng tạm cho mỗi roomEntity từ bảng Room
                         {
                             RoomData = roomEntity, // Thông tin cơ bản của phòng
-                                                   // Tìm bản ghi Rent "active" (chưa có Invoice) cho phòng này.
+                                                   // Tìm bản ghi Rent "active" (isDone = false) cho phòng này.
                                                    // Nếu có nhiều (không nên xảy ra cho phòng Occupied), lấy bản ghi có CheckInDate mới nhất.
                             ActiveRentData = (roomEntity.RStatus == "in_use")
                                 ? context.Rent
-                                    .Where(rent => rent.RID == roomEntity.RID &&
-                                                   // Điều kiện THEN CHỐT: Rent này CHƯA có Invoice nào liên kết
-                                                   !context.Invoice.Any(invoice => invoice.RelID == rent.RelID))
+                                    .Where(rent => rent.RID == roomEntity.RID && rent.isDone == false) 
                                     .OrderByDescending(rent => rent.CheckInDate)
                                     .FirstOrDefault() // Lấy 1 hoặc null
                                 : null // Nếu phòng không Occupied/in_use, không có ActiveRentData
