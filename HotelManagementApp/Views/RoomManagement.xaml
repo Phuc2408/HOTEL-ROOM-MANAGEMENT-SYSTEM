@@ -49,37 +49,7 @@
                    VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <!-- 🔍 Search -->
-                <TextBox Width="200" Margin="0,0,10,0"
-             materialDesign:HintAssist.Hint="Search..."
-             VerticalAlignment="Center"/>
-
-                <!-- 🔽 Sort -->
-                <ComboBox Width="150" Margin="0,0,10,0"
-              VerticalAlignment="Center"
-              materialDesign:HintAssist.Hint="Sort">
-                    <ComboBoxItem Content="Số phòng tăng dần"/>
-                    <ComboBoxItem Content="Số phòng giảm dần"/>
-                </ComboBox>
-                <!-- Buttons -->
-                <Button x:Name="EditButton" 
-         Style="{StaticResource SquareIconButtonStyle}" 
-         Background="Transparent" 
-         Foreground="#673AB7" 
-         Margin="0,0,5,0" 
-         Padding="8,3" 
-         BorderThickness="0">
-                    <iconPacks:PackIconMaterial Kind="SquareEditOutline" Width="15" Height="15"/>
-                </Button>
-                <Button x:Name="DeleteButton" 
-         Style="{StaticResource SquareIconButtonStyle}" 
-         Background="Transparent" 
-         Foreground="red" 
-         Margin="0,0,5,0" 
-         Padding="8,3" 
-         BorderThickness="0" >
-                    <iconPacks:PackIconMaterial Kind="DeleteOutline" Width="15" Height="15"/>
-                </Button>
+                
             </DockPanel>
         </StackPanel>
 
@@ -123,8 +93,7 @@
                     <Border Background="Gold" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
                     <TextBlock Text="Cleaning" VerticalAlignment="Center" Margin="0,0,15,0"/>
 
-                    <Border Background="Red" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
-                    <TextBlock Text="Overdue" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                   
 
                     <Border Background="White" BorderBrush="Gray" BorderThickness="1" Width="20" Height="20" CornerRadius="3" Margin="0,0,5,0"/>
                     <TextBlock Text="Empty" VerticalAlignment="Center" Margin="0,0,15,0"/>

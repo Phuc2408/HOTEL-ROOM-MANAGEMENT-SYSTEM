@@ -346,65 +346,6 @@ VALUES
 (327, 22, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
 (328, 1, '2025-04-25', '2025-04-27', '14:00', '12:00', 2);
 
-GO
 
-
-
-
-CREATE PROCEDURE sp_AddCustomer
-    @CName NVARCHAR(100),
-    @CPhone NVARCHAR(20),
-    @CPersonalID NVARCHAR(20),
-    @CMail NVARCHAR(100),
-    @CCountry NVARCHAR(50)
-AS
-BEGIN
-    INSERT INTO Customer (CName, CPhone, CPersonalID, CMail, CCountry)
-    VALUES (@CName, @CPhone, @CPersonalID, @CMail, @CCountry);
-END;
-
-GO
-CREATE PROCEDURE sp_AddRent
-    @CID INT,
-    @RID INT,
-    @CheckInDate DATE,
-    @CheckOutDate DATE,
-    @CheckInTime TIME,
-    @CheckOutTime TIME,
-    @NumberOfPeople INT
-AS
-BEGIN
-    INSERT INTO Rent (CID, RID, CheckInDate, CheckOutDate, CheckInTime, CheckOutTime, NumberOfPeople)
-    VALUES (@CID, @RID, @CheckInDate, @CheckOutDate, @CheckInTime, @CheckOutTime, @NumberOfPeople);
-
-    UPDATE Room SET RStatus = 'Occupied' WHERE RID = @RID;
-END;
-
-GO
-CREATE PROCEDURE sp_CheckOut
-    @RelID INT,
-    @ActualCheckOutTime TIME
-AS
-BEGIN
-    DECLARE @RID INT;
-    SELECT @RID = RID FROM Rent WHERE RelID = @RelID;
-
-    UPDATE Rent SET CheckOutTime = @ActualCheckOutTime WHERE RelID = @RelID;
-
-    UPDATE Room SET RStatus = 'Cleaning' WHERE RID = @RID;
-END;
-
-GO
-CREATE PROCEDURE sp_AddInvoice
-    @CID INT,
-    @RelID INT,
-    @IDate DATE,
-    @RoomTotal DECIMAL(10,2),
-    @ServiceTotal DECIMAL(10,2),
-    @Total DECIMAL(10,2)
-AS
-BEGIN
-    INSERT INTO Invoice (CID, RelID, IDate, RoomTotal, ServiceTotal, Total)
-    VALUES (@CID, @RelID, @IDate, @RoomTotal, @ServiceTotal, @Total);
-END;
+Go
 

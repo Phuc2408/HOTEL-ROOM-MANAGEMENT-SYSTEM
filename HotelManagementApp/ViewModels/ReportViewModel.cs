@@ -1,14 +1,15 @@
-﻿using LiveCharts;
-using LiveCharts.Wpf;
-using HotelManagementApp.Database;
+﻿using HotelManagementApp.Database;
 using HotelManagementApp.Models;
+using LiveCharts;
+using LiveCharts.Wpf;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Runtime.CompilerServices;
-using System.Collections.Generic;
 
 namespace HotelManagementApp.ViewModels
 {
@@ -104,15 +105,16 @@ namespace HotelManagementApp.ViewModels
 
                 if (mode == "Today")
                 {
-                    // ... giữ nguyên phần “Today” như trước ...
                     var invoicesToday = db.Invoice
-                        .Where(i => i.IDate == today)
+                        .Include(i => i.Rent)
+                        .Where(i => i.IDate == today && i.Rent.isDone)
                         .GroupBy(i => i.IDate.Hour)
                         .Select(g => new { Hour = g.Key, Sum = g.Sum(i => (double)i.Total) })
                         .ToDictionary(x => x.Hour, x => x.Sum);
 
                     var invoicesYesterday = db.Invoice
-                        .Where(i => i.IDate == today.AddDays(-1))
+                        .Include(i => i.Rent)
+                        .Where(i => i.IDate == today.AddDays(-1) && i.Rent.isDone)
                         .GroupBy(i => i.IDate.Hour)
                         .Select(g => new { Hour = g.Key, Sum = g.Sum(i => (double)i.Total) })
                         .ToDictionary(x => x.Hour, x => x.Sum);
@@ -130,24 +132,24 @@ namespace HotelManagementApp.ViewModels
                 }
                 else if (mode == "Week")
                 {
-                    // ... giữ nguyên phần “Week” như trước ...
                     int diffToMonday = (today.DayOfWeek == DayOfWeek.Sunday)
                                           ? -6
                                           : (DayOfWeek.Monday - today.DayOfWeek);
                     DateTime monday = today.AddDays(diffToMonday);
                     DateTime sunday = monday.AddDays(6);
-
                     DateTime prevMonday = monday.AddDays(-7);
                     DateTime prevSunday = sunday.AddDays(-7);
 
                     var invoicesWeek = db.Invoice
-                        .Where(i => i.IDate >= monday && i.IDate <= sunday)
+                        .Include(i => i.Rent)
+                        .Where(i => i.IDate >= monday && i.IDate <= sunday && i.Rent.isDone)
                         .GroupBy(i => i.IDate.Date)
                         .Select(g => new { Date = g.Key, Sum = g.Sum(i => (double)i.Total) })
                         .ToDictionary(x => x.Date, x => x.Sum);
 
                     var invoicesPrevWeek = db.Invoice
-                        .Where(i => i.IDate >= prevMonday && i.IDate <= prevSunday)
+                        .Include(i => i.Rent)
+                        .Where(i => i.IDate >= prevMonday && i.IDate <= prevSunday && i.Rent.isDone)
                         .GroupBy(i => i.IDate.Date)
                         .Select(g => new { Date = g.Key, Sum = g.Sum(i => (double)i.Total) })
                         .ToDictionary(x => x.Date, x => x.Sum);
@@ -167,65 +169,43 @@ namespace HotelManagementApp.ViewModels
                 }
                 else if (mode == "Month")
                 {
-                    // =============================
-                    // BẮT ĐẦU: nhóm hóa đơn theo tuần (T2–CN) trong tháng
-                    // =============================
+                    // ... giữ nguyên như cũ, thêm filter i.Rent.isDone ...
                     int year = today.Year;
                     int month = today.Month;
-                    // Ngày đầu và ngày cuối của tháng hiện tại
                     DateTime firstDayThisMonth = new DateTime(year, month, 1);
                     int daysThisMonth = DateTime.DaysInMonth(year, month);
                     DateTime lastDayThisMonth = new DateTime(year, month, daysThisMonth);
-
-                    // Xác định Chủ Nhật đầu tiên của tháng (tuần 1 kết thúc)
-                    // Nếu firstDayThisMonth.DayOfWeek = Thu, Fri, Sat, Sun, etc.
-                    // Tính offset tới Chủ Nhật:
                     int offsetToSunday = ((int)DayOfWeek.Sunday - (int)firstDayThisMonth.DayOfWeek + 7) % 7;
                     DateTime firstSunday = firstDayThisMonth.AddDays(offsetToSunday);
 
-                    // Danh sách các cặp (start, end) cho từng tuần của tháng
                     var weekRangesThisMonth = new List<(DateTime Start, DateTime End)>();
-
-                    // Tuần 1: từ ngày đầu tháng (1) đến firstSunday
                     if (firstSunday <= lastDayThisMonth)
-                    {
                         weekRangesThisMonth.Add((firstDayThisMonth, firstSunday));
-                    }
                     else
-                    {
-                        // Nếu tháng bắt đầu và kết thúc trước khi có Chủ Nhật (kỳ hiếm, nhất là tháng 2)
                         weekRangesThisMonth.Add((firstDayThisMonth, lastDayThisMonth));
-                    }
 
-                    // Tạo các tuần kế tiếp: bắt đầu = ngày kế tiếp firstSunday
                     DateTime weekStart = firstSunday.AddDays(1);
                     while (weekStart <= lastDayThisMonth)
                     {
-                        DateTime weekEnd = weekStart.AddDays(6); // thường là T2 -> CN
+                        DateTime weekEnd = weekStart.AddDays(6);
                         if (weekEnd > lastDayThisMonth) weekEnd = lastDayThisMonth;
                         weekRangesThisMonth.Add((weekStart, weekEnd));
                         weekStart = weekEnd.AddDays(1);
                     }
 
-                    // --- Tương tự với tháng trước ---
                     DateTime firstDayLastMonth = firstDayThisMonth.AddMonths(-1);
                     int yearLast = firstDayLastMonth.Year;
                     int monthLast = firstDayLastMonth.Month;
                     int daysLastMonth = DateTime.DaysInMonth(yearLast, monthLast);
                     DateTime lastDayLastMonth = new DateTime(yearLast, monthLast, daysLastMonth);
-
                     int offsetToSundayPrev = ((int)DayOfWeek.Sunday - (int)firstDayLastMonth.DayOfWeek + 7) % 7;
                     DateTime firstSundayPrev = firstDayLastMonth.AddDays(offsetToSundayPrev);
 
                     var weekRangesLastMonth = new List<(DateTime Start, DateTime End)>();
                     if (firstSundayPrev <= lastDayLastMonth)
-                    {
                         weekRangesLastMonth.Add((firstDayLastMonth, firstSundayPrev));
-                    }
                     else
-                    {
                         weekRangesLastMonth.Add((firstDayLastMonth, lastDayLastMonth));
-                    }
 
                     DateTime weekStartPrev = firstSundayPrev.AddDays(1);
                     while (weekStartPrev <= lastDayLastMonth)
@@ -236,34 +216,32 @@ namespace HotelManagementApp.ViewModels
                         weekStartPrev = weekEndPrev.AddDays(1);
                     }
 
-                    // --- Tính tổng doanh thu cho mỗi tuần trong tháng này --- 
                     for (int w = 0; w < weekRangesThisMonth.Count; w++)
                     {
                         var (start, end) = weekRangesThisMonth[w];
                         double rev = db.Invoice
-                            .Where(i => i.IDate >= start && i.IDate <= end)
+                            .Include(i => i.Rent)
+                            .Where(i => i.IDate >= start && i.IDate <= end && i.Rent.isDone)
                             .Sum(i => (double)i.Total);
                         currentPeriod.Add((start, rev));
                         currentSum += rev;
                     }
 
-                    // --- Tính tổng doanh thu cho mỗi tuần trong tháng trước --- 
                     for (int w = 0; w < weekRangesLastMonth.Count; w++)
                     {
                         var (start, end) = weekRangesLastMonth[w];
                         double rev = db.Invoice
-                            .Where(i => i.IDate >= start && i.IDate <= end)
+                            .Include(i => i.Rent)
+                            .Where(i => i.IDate >= start && i.IDate <= end && i.Rent.isDone)
                             .Sum(i => (double)i.Total);
                         previousPeriod.Add((start, rev));
                         previousSum += rev;
                     }
 
-                    // --- Chuẩn bị Labels (W1, W2, W3, …) hoặc bạn có thể để "1-4", "5-11", ... ---
                     Labels = weekRangesThisMonth
                         .Select((range, idx) => $"W{idx + 1}")
                         .ToArray();
 
-                    // --- Vẽ dữ liệu lên ChartSeries ---
                     var values = new ChartValues<double>(currentPeriod.Select(x => x.revenue));
                     ChartSeries.Clear();
                     ChartSeries.Add(new LineSeries
@@ -276,7 +254,6 @@ namespace HotelManagementApp.ViewModels
 
                     YFormatter = value => value.ToString("N0") + " đ";
 
-                    // --- Cập nhật tổng doanh thu & so sánh với tháng trước ---
                     TotalRevenue = currentSum;
                     double percentChange = previousSum == 0
                         ? (currentSum > 0 ? 1 : 0)
@@ -286,7 +263,6 @@ namespace HotelManagementApp.ViewModels
                     RevenueChangeColor = percentChange >= 0 ? Brushes.Green : Brushes.Red;
                     RevenueCompareLabel = "compared to last month";
 
-                    // --- Báo UI cập nhật ---
                     OnPropertyChanged(nameof(ChartSeries));
                     OnPropertyChanged(nameof(Labels));
                     OnPropertyChanged(nameof(YFormatter));
@@ -298,18 +274,19 @@ namespace HotelManagementApp.ViewModels
                 }
                 else if (mode == "Year")
                 {
-                    // ... giữ nguyên phần “Year” như trước ...
                     int year = today.Year;
                     int prevYear = year - 1;
 
                     var invoicesThisYear = db.Invoice
-                        .Where(i => i.IDate.Year == year)
+                        .Include(i => i.Rent)
+                        .Where(i => i.IDate.Year == year && i.Rent.isDone)
                         .GroupBy(i => i.IDate.Month)
                         .Select(g => new { Month = g.Key, Sum = g.Sum(i => (double)i.Total) })
                         .ToDictionary(x => x.Month, x => x.Sum);
 
                     var invoicesLastYear = db.Invoice
-                        .Where(i => i.IDate.Year == prevYear)
+                        .Include(i => i.Rent)
+                        .Where(i => i.IDate.Year == prevYear && i.Rent.isDone)
                         .GroupBy(i => i.IDate.Month)
                         .Select(g => new { Month = g.Key, Sum = g.Sum(i => (double)i.Total) })
                         .ToDictionary(x => x.Month, x => x.Sum);
@@ -328,7 +305,6 @@ namespace HotelManagementApp.ViewModels
                     }
                 }
 
-                // Nếu mode không phải “Month”, thì chạy phần “chung” (giống như trước)
                 if (mode != "Month")
                 {
                     TotalRevenue = currentSum;
@@ -344,12 +320,10 @@ namespace HotelManagementApp.ViewModels
                     {
                         "Today" => "compared to yesterday",
                         "Week" => "compared to last week",
-                        // Chế độ “Month” đã tự gán trong nhánh trên
                         "Year" => "compared to last year",
                         _ => ""
                     };
 
-                    // Chuẩn bị dữ liệu chung cho ChartSeries và Labels
                     var values = new ChartValues<double>();
                     var labelsList = new List<string>();
                     foreach (var item in currentPeriod)
@@ -359,7 +333,7 @@ namespace HotelManagementApp.ViewModels
                             labelsList.Add(item.key.ToString("HH") + "h");
                         else if (mode == "Week")
                             labelsList.Add(item.key.ToString("ddd"));
-                        else // Year
+                        else
                             labelsList.Add(item.key.ToString("MMM"));
                     }
 
@@ -386,6 +360,7 @@ namespace HotelManagementApp.ViewModels
                 }
             }
         }
+
 
 
         // ============================

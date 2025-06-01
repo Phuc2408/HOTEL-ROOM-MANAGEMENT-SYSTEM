@@ -45,35 +45,9 @@
                          VerticalAlignment="Center"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <!-- 🔽 Sort -->
-                <ComboBox Width="150" Margin="0,0,10,0"
-                          VerticalAlignment="Center"
-                          materialDesign:HintAssist.Hint="Sort">
-                    <ComboBoxItem Content="Newest"/>
-                    <ComboBoxItem Content="Oldest"/>
-                </ComboBox>
+                
 
-                <!-- Buttons -->
-                <Button x:Name="EditButton" 
-                        Style="{StaticResource SquareIconButtonStyle}" 
-                        Background="Transparent" 
-                        Foreground="#673AB7" 
-                        Margin="0,0,5,0" 
-                        Padding="8,3" 
-                        BorderThickness="0" 
-                        Click="EditButton_Click">
-                    <iconPacks:PackIconMaterial Kind="SquareEditOutline" Width="15" Height="15"/>
-                </Button>
-                <Button x:Name="DeleteButton" 
-                        Style="{StaticResource SquareIconButtonStyle}" 
-                        Background="Transparent" 
-                        Foreground="red" 
-                        Margin="0,0,5,0" 
-                        Padding="8,3" 
-                        BorderThickness="0" 
-                        Command="{Binding DeleteCommand}">
-                    <iconPacks:PackIconMaterial Kind="DeleteOutline" Width="15" Height="15"/>
-                </Button>
+           
             </StackPanel>
         </Grid>
 

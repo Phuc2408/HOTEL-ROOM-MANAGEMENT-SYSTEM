@@ -54,21 +54,17 @@ namespace HotelManagementApp.ViewModels
 
         public void LoadGuests()
         {
-            // Bước 1: Truy vấn EF không dùng switch/Brushes
             var rawData = (from rent in _context.Rent
                            join customer in _context.Customer on rent.CID equals customer.CID
                            join room in _context.Room on rent.RID equals room.RID
-                           where rent.CheckInDate == _context.Rent
-                               .Where(r2 => r2.RID == rent.RID)
-                               .Max(r2 => r2.CheckInDate)
+                           orderby rent.CheckInDate descending
                            select new
                            {
                                customer,
                                room,
                                rent
-                           }).ToList(); // ✅ OK với EF
+                           }).ToList();
 
-            // Bước 2: Ánh xạ sang GuestModel, dùng C# thường
             var guestList = rawData.Select(data => new GuestModel
             {
                 CID = data.customer.CID,
@@ -80,15 +76,11 @@ namespace HotelManagementApp.ViewModels
                 Room = "Room " + data.room.RID,
                 CheckInDate = data.rent.CheckInDate,
                 CheckOutDate = data.rent.CheckOutDate,
-                StatusColor = data.room.RStatus switch
-                {
-                    "in_use" => Brushes.Green,
-                    "checked_out" or "overdue" => Brushes.Red,
-                    _ => Brushes.Gray
-                }
+                StatusColor = data.rent.isDone
+                    ? Brushes.Gray // đã check-out thì xám
+                    : Brushes.Green // đang ở thì xanh
             }).ToList();
 
-            // Gán vào danh sách
             AllGuests.Clear();
             foreach (var guest in guestList)
                 AllGuests.Add(guest);

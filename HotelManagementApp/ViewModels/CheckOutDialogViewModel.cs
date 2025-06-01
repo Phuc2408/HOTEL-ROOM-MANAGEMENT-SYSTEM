@@ -521,7 +521,21 @@ namespace HotelManagementApp.ViewModels
                 }
 
                 db.SaveChanges();
+
+                // ✅ Cập nhật lại Invoice.ServiceTotal và Invoice.Total
+                var invoice = db.Invoice.FirstOrDefault(i => i.IID == CurrentInvoiceId);
+                if (invoice != null)
+                {
+                    invoice.ServiceTotal = db.ServiceUsage
+                        .Where(su => su.IID == CurrentInvoiceId)
+                        .Sum(su => su.ServiceTotal);
+
+                    invoice.Total = invoice.RoomTotal + invoice.ServiceTotal;
+                    db.Invoice.Update(invoice);
+                    db.SaveChanges();
+                }
             }
+
             CalculateTotalPrice();
         }
 

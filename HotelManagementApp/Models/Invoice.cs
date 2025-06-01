@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations.Schema; // THÊM DÒNG NÀY
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelManagementApp.Models
 {
@@ -13,14 +13,25 @@ namespace HotelManagementApp.Models
     {
         [Key]
         public int IID { get; set; }
+
         public int CID { get; set; }
+
         public int RelID { get; set; }
+
         public DateTime IDate { get; set; }
+
         public decimal RoomTotal { get; set; }
+
         public decimal ServiceTotal { get; set; }
+
         public decimal Total { get; set; }
-        [NotMapped] // <<< THÊM DÒNG NÀY VÀO
+
+        [NotMapped]
         public ObservableCollection<Service> Services { get; set; }
+
+        // ✅ Navigation property để JOIN được với Rent
+        [ForeignKey("RelID")]
+        public virtual Rent Rent { get; set; }
 
         public Invoice()
         {
