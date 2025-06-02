@@ -9,6 +9,11 @@ namespace HotelManagementApp.Helpers
     {
         public bool AddBooking(int customerId, int roomId, DateTime checkInDate, DateTime checkOutDate, int numberOfPeople)
         {
+            if (checkOutDate.Date <= checkInDate.Date)
+            {
+                MessageBox.Show("Ngày trả phòng phải lớn hơn ngày nhận phòng.", "Lỗi ngày đặt phòng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
             try
             {
                 using (var context = new AppDbContext())

@@ -32,7 +32,6 @@ namespace HotelManagementApp.Views.Dialogs
 
                     if (cid <= 0)
                     {
-                        MessageBox.Show("Failed to create guest.");
                         return;
                     }
 
@@ -51,7 +50,6 @@ namespace HotelManagementApp.Views.Dialogs
                     }
                     else
                     {
-                        MessageBox.Show("Failed to check in when creating booking.");
                         this.DialogResult = false;
                     }
                 }
