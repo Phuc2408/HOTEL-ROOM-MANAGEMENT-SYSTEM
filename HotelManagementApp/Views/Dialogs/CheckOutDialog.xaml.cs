@@ -3,6 +3,7 @@ using HotelManagementApp.Models;
 using HotelManagementApp.ViewModels;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace HotelManagementApp.Views.Dialogs
 {
@@ -53,7 +54,12 @@ namespace HotelManagementApp.Views.Dialogs
                 // this.Close(); // Hoặc không đóng
             }
         }
-
+        private void QuantityTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            var be = tb?.GetBindingExpression(TextBox.TextProperty);
+            be?.UpdateSource();
+        }
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;

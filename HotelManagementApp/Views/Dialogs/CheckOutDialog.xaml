@@ -146,13 +146,15 @@
                             <DataGridTemplateColumn Header="Quantity" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-         IsReadOnly="{Binding IsReadOnly}"
-         BorderThickness="0"
-         Background="Transparent"
-         VerticalContentAlignment="Center"
-         HorizontalContentAlignment="Left"
-         TextAlignment="Left"/>
+                                        <TextBox
+    Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+    IsReadOnly="{Binding IsReadOnly}"
+    BorderThickness="0"
+    Background="Transparent"
+    VerticalContentAlignment="Center"
+    HorizontalContentAlignment="Left"
+    TextAlignment="Left"
+    LostFocus="QuantityTextBox_LostFocus" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
