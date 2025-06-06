@@ -34,5 +34,32 @@ namespace HotelManagementApp.Helpers
                 return -1;
             }
         }
+        public Guest GetGuestByIdCard(string idCard)
+        {
+            using (var db = new AppDbContext())
+            {
+                // Bước 1: Lấy thực thể 'Customer' từ cơ sở dữ liệu.
+                var customerEntity = db.Customer.FirstOrDefault(c => c.CPersonalID.Trim().ToUpper() == idCard.Trim().ToUpper());
+
+                // Bước 2: Nếu không tìm thấy customer trong CSDL, trả về null.
+                if (customerEntity == null)
+                {
+                    return null;
+                }
+
+                // Bước 3: Tạo một đối tượng 'Guest' mới và sao chép dữ liệu từ 'customerEntity'.
+                var guestResult = new Guest
+                {
+                    CName = customerEntity.CName,
+                    CPersonalID = customerEntity.CPersonalID,
+                    CPhone = customerEntity.CPhone,
+                    CCountry = customerEntity.CCountry,
+                    CMail = customerEntity.CMail
+                };
+
+                // Bước 4: Trả về đối tượng 'Guest' đã được tạo.
+                return guestResult;
+            }
+        }
     }
 }

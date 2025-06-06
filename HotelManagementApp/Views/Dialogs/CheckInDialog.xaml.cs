@@ -1,6 +1,6 @@
-﻿using HotelManagementApp.Database; // để dùng AppDbContext
+﻿using HotelManagementApp.Database;
 using HotelManagementApp.Helpers;
-using HotelManagementApp.Models;   // nếu cần RoomModel
+using HotelManagementApp.Models;
 using HotelManagementApp.ViewModels;
 using System;
 using System.Linq;
@@ -18,6 +18,56 @@ namespace HotelManagementApp.Views.Dialogs
             vm.RoomId = roomId;
             this.DataContext = vm;
         }
+
+        // ---------------------------------------------------------------------------------
+        // MỚI: PHƯƠNG THỨC XỬ LÝ NÚT KIỂM TRA ID (BẮT ĐẦU)
+        // ---------------------------------------------------------------------------------
+        private void CheckIdButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Lấy viewModel hiện tại từ DataContext
+            if (DataContext is CheckInDialogViewModel vm)
+            {
+                if (string.IsNullOrWhiteSpace(vm.IdCard))
+                {
+                    MessageBox.Show("Please enter an ID Card number to check.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // Khởi tạo GuestService để tương tác với CSDL
+                var guestService = new GuestService();
+                try
+                {
+                    // KIỂM TRA: Đảm bảo bạn có phương thức 'GetGuestByIdCard' trong GuestService.
+                    // Nếu chưa có, hãy xem hướng dẫn ở mục 2 bên dưới.
+                    var existingGuest = guestService.GetGuestByIdCard(vm.IdCard);
+
+                    if (existingGuest != null)
+                    {
+                        // Nếu tìm thấy, cập nhật thông tin lên ViewModel
+
+                        // KIỂM TRA: Đảm bảo các tên thuộc tính (CName, CPhone, CCountry)
+                        // khớp với tên trong class Model 'Guest' của bạn.
+                        vm.GuestName = existingGuest.CName;
+                        vm.PhoneNumber = existingGuest.CPhone;
+                        vm.SelectedCountry = existingGuest.CCountry;
+
+                        MessageBox.Show("Guest information found and pre-filled.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("No guest found with this ID card number.", "Not Found", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("System error when checking guest: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        // ---------------------------------------------------------------------------------
+        // MỚI: PHƯƠNG THỨC XỬ LÝ NÚT KIỂM TRA ID (KẾT THÚC)
+        // ---------------------------------------------------------------------------------
+
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
@@ -86,10 +136,6 @@ namespace HotelManagementApp.Views.Dialogs
                             roomEntity.RStatus = "repairing";
                             db.SaveChanges();
                             updateSuccess = true;
-                            // Nếu dùng RoomModel trong ViewModel, bạn có thể cập nhật thêm:
-                            // roomModel.Status = "Repairing";
-                            // roomModel.GuestName = null;
-                            // roomModel.CheckInDate = null;
                         }
                         else
                         {
