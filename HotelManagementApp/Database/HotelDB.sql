@@ -6,66 +6,76 @@ GO
 USE HotelDB;
 GO
 
--- TẠO BẢNG KHÁCH HÀNG
-CREATE TABLE Customer (
-    CID INT PRIMARY KEY IDENTITY(1,1),
-    CName NVARCHAR(100) NOT NULL,
-    CPhone NVARCHAR(20) NOT NULL,
-    CPersonalID NVARCHAR(20) NOT NULL,
-    CMail NVARCHAR(100) NOT NULL,
-    CCountry NVARCHAR(50) NOT NULL
-);
+-- Drop tables to avoid foreign key conflict on re-run
+DROP TABLE IF EXISTS ServiceUsage;
+DROP TABLE IF EXISTS Invoice;
+DROP TABLE IF EXISTS Service;
+DROP TABLE IF EXISTS Rent;
+DROP TABLE IF EXISTS Customer;
+DROP TABLE IF EXISTS Room;
 
--- TẠO BẢNG PHÒNG
+-- Bảng Room
 CREATE TABLE Room (
     RID INT PRIMARY KEY IDENTITY(1,1),
-    RType NVARCHAR(50),
-    RStatus NVARCHAR(20),
-    RPrice DECIMAL(10, 2),
-    RFloor INT
+    RType VARCHAR(50),
+    RStatus VARCHAR(20),
+    RPrice DECIMAL(10,2),
+    Rfloor INT
 );
 
--- TẠO BẢNG THUÊ PHÒNG (RENT)
+-- Bảng Customer
+CREATE TABLE Customer (
+    CID INT PRIMARY KEY IDENTITY(1,1),
+    CName VARCHAR(100),
+    CPhone VARCHAR(20),
+    CPersonalID VARCHAR(20),
+    Cmail VARCHAR(100),
+    Ccountry VARCHAR(50)
+);
+
+-- Bảng Rent
 CREATE TABLE Rent (
-    RelID INT PRIMARY KEY IDENTITY(1,1),
-    RID INT FOREIGN KEY REFERENCES Room(RID),
-    CID INT FOREIGN KEY REFERENCES Customer(CID),
+    ReID INT PRIMARY KEY IDENTITY(1,1),
+    RID INT,
+    CID INT,
     CheckInDate DATE,
     CheckOutDate DATE,
     CheckInTime TIME,
     CheckOutTime TIME,
     NumberOfPeople INT,
-    isDone BIT DEFAULT 0
-        CHECK (isDone IN (0, 1))
+    isDone BIT DEFAULT 0,
+    FOREIGN KEY (RID) REFERENCES Room(RID),
+    FOREIGN KEY (CID) REFERENCES Customer(CID)
 );
 
--- TẠO BẢNG HÓA ĐƠN
-CREATE TABLE Invoice (
-    IID INT PRIMARY KEY IDENTITY(1,1),
-    CID INT FOREIGN KEY REFERENCES Customer(CID),
-    RelID INT FOREIGN KEY REFERENCES Rent(RelID),
-    IDate DATE,
-    RoomTotal DECIMAL(10,2),
-    ServiceTotal DECIMAL(10,2),
-    Total DECIMAL(10,2)
-);
-
--- TẠO BẢNG DỊCH VỤ
+-- Bảng Service
 CREATE TABLE Service (
     SID INT PRIMARY KEY IDENTITY(1,1),
-    SName NVARCHAR(100),
-    SUnit NVARCHAR(20),
+    SName VARCHAR(100),
+    SUnit VARCHAR(20),
     SPrice DECIMAL(10,2)
 );
 
--- TẠO BẢNG SỬ DỤNG DỊCH VỤ
+-- Bảng ServiceUsage
 CREATE TABLE ServiceUsage (
     UID INT PRIMARY KEY IDENTITY(1,1),
-    SID INT FOREIGN KEY REFERENCES Service(SID),
-    CID INT FOREIGN KEY REFERENCES Customer(CID),
-    IID INT FOREIGN KEY REFERENCES Invoice(IID),
+    SID INT,
+    ReID INT,
     Quantity INT,
-    ServiceTotal DECIMAL(10,2)
+    TotalPerService DECIMAL(10,2),
+    FOREIGN KEY (SID) REFERENCES Service(SID),
+    FOREIGN KEY (ReID) REFERENCES Rent(ReID)
+);
+
+-- Bảng Invoice
+CREATE TABLE Invoice (
+    IID INT PRIMARY KEY IDENTITY(1,1),
+    ReID INT,
+    InvoiceDate DATE,
+    RoomTotal DECIMAL(10,2),
+    ServiceTotal DECIMAL(10,2),
+    Total DECIMAL(10,2),
+    FOREIGN KEY (ReID) REFERENCES Rent(ReID)
 );
 
 
@@ -249,103 +259,6 @@ INSERT INTO Customer (CName, CPhone, CPersonalID, CMail, CCountry) VALUES
 (N'Hoàng Văn Em', '0336302138', '936852633062', 'pvalentine@gmail.com', 'Vietnam'),
 (N'Đặng Thị Phúc', '0338907477', '829990176814', 'mlee@gmail.com', 'Vietnam'),
 (N'Bùi Văn Giang', '0351198700', '265989405528', 'jreed@gmail.com', 'Vietnam'),
-(N'Vũ Thị Hiền', '0352230141', '675703288538', 'tylerjohnson@gmail.com', 'Vietnam'),
-(N'Ngô Văn Ích', '0353301862', '709003870742', 'vsantos@gmail.com', 'Vietnam'),
-(N'Dương Thị Giang', '0354607301', '870093223239', 'heatherberger@gmail.com', 'Vietnam'),
-(N'Lương Văn Khoa', '0354791182', '643194608808', 'michaeljones@gmail.com', 'Vietnam'),
-(N'Nguyễn Thị Hồng', '0365212821', '234045062862', 'lbyrd@gmail.com', 'Vietnam'),
-(N'Phạm Văn Nam', '0367678572', '286535962262', 'glowe@gmail.com', 'Vietnam'),
-(N'Bùi Thị Hoa', '0376879943', '755906156243', 'xcarr@gmail.com', 'Vietnam'),
-(N'Lê Văn Phú', '0389296225', '746978396814', 'osbornejeffery@gmail.com', 'Vietnam'),
-(N'Hoàng Thị Minh', '0389477582', '811596191948', 'usalazar@gmail.com', 'Vietnam'),
-(N'Trần Văn Tiến', '0394604656', '311593615101', 'jimmy55@gmail.com', 'Vietnam'),
-(N'Ngô Thị Mai', '0395310864', '200016021541', 'nperry@gmail.com', 'Vietnam'),
-(N'Đặng Văn Lâm', '0398134117', '163291531936', 'joshuatucker@gmail.com', 'Vietnam'),
-(N'Vũ Thị Lan', '0809531373', '285784434015', 'qwhite@gmail.com', 'Vietnam'),
-(N'Nguyễn Minh Tuấn', '0816051892', '960623968935', 'debraharrington@gmail.com', 'Vietnam'),
-(N'Phan Thị Ngọc', '0816329619', '232146200801', 'katie29@gmail.com', 'Vietnam'),
-(N'Hồ Văn Long', '0821705027', '673845809750', 'curtisbarton@gmail.com', 'Vietnam'),
-(N'Đỗ Thị Hạnh', '0823031553', '219548672278', 'cynthia72@gmail.com', 'Vietnam'),
-(N'Trịnh Văn Khánh', '0823326041', '492801294807', 'qhudson@gmail.com', 'Vietnam'),
-(N'Lâm Thị Xuân', '0828408152', '877075030821', 'christophercortez@gmail.com', 'Vietnam'),
-(N'Mai Văn Hùng', '0828811531', '775571619117', 'ronald85@gmail.com', 'Vietnam'),
-(N'Dương Thị Diễm', '0831706321', '887224917394', 'lhill@gmail.com', 'Vietnam'),
-(N'Kiều Văn Hoàng', '0832594070', '340978382620', 'heidi27@gmail.com', 'Vietnam'),
-(N'Tống Thị Thảo', '0839925928', '229505591630', 'shortrichard@gmail.com', 'Vietnam'),
-(N'Triệu Văn Bình', '0841090385', '366096116940', 'yobrien@gmail.com', 'Vietnam'),
-(N'Vương Thị Duyên', '0846570171', '243641476636', 'mezajared@gmail.com', 'Vietnam'),
-(N'Cao Văn Thành', '0857000234', '814371432396', 'carlos88@gmail.com', 'Vietnam'),
-(N'Lữ Thị Phượng', '0861346859', '208112074056', 'dennis58@gmail.com', 'Vietnam'),
-(N'Nguyễn Văn Bảo', '0865253884', '484856586384', 'ihays@gmail.com', 'Vietnam'),
-(N'Lê Thị Thảo', '0866083328', '900546540880', 'tylerjimenez@gmail.com', 'Vietnam'),
-(N'Trần Văn Đông', '0866800959', '965971905070', 'cjackson@gmail.com', 'Vietnam'),
-(N'Phạm Thị Hường', '0868121309', '965484731164', 'ejohnson@gmail.com', 'Vietnam'),
-(N'Hoàng Văn Trí', '0878040709', '265850595554', 'berryalyssa@gmail.com', 'Vietnam'),
-(N'Đặng Thị Linh', '0881625140', '681846172736', 'heather73@gmail.com', 'Vietnam'),
-(N'Bùi Văn Khải', '0888288690', '646752311074', 'patricia22@gmail.com', 'Vietnam'),
-(N'Vũ Thị Yến', '0893417500', '610016839610', 'cherylmiller@gmail.com', 'Vietnam'),
-(N'Ngô Văn Đức', '0894555793', '706203924771', 'katrinaanderson@gmail.com', 'Vietnam'),
-(N'Dương Thị Thắm', '0904812665', '888373219730', 'david49@gmail.com', 'Vietnam'),
-(N'Đỗ Văn Toàn', '0905786525', '640130045949', 'bryananthony@gmail.com', 'Vietnam'),
-(N'Phan Thị Hòa', '0907489254', '363260563541', 'timothy64@gmail.com', 'Vietnam'),
-(N'Hồ Văn Kỳ', '0911874777', '838722287204', 'theresa25@gmail.com', 'Vietnam'),
-(N'Tô Thị Tươi', '0913713037', '849878093642', 'sydneybarrera@gmail.com', 'Vietnam'),
-(N'Đinh Văn Hoàng', '0936697964', '410273586633', 'brandywilliams@gmail.com', 'Vietnam'),
-(N'Lâm Thị Hằng', '0942947946', '515394835598', 'hudsonjames@gmail.com', 'Vietnam'),
-(N'Trịnh Văn Bích', '0967871648', '709734678374', 'longlaura@gmail.com', 'Vietnam'),
-(N'Hà Thị Tuyết', '0977325395', '913861833054', 'catherinerobertson@gmail.com', 'Vietnam'),
-(N'Nguyễn Văn Bình', '0978248204', '700866211908', 'user53@gmail.com', 'Vietnam'),
-(N'Lê Văn Thành', '0986191942', '591913052169', 'user54@gmail.com', 'Vietnam');
+(N'Vũ Thị Hiền', '0352230141', '675703288538', 'tylerjohnson@gmail.com', 'Vietnam');
 
---Chèn dữ liệu bảng thuê phòng
-INSERT INTO Rent (RID, CID, CheckInDate, CheckOutDate, CheckInTime, CheckOutTime, NumberOfPeople)
-VALUES
-(101, 10, '2025-04-20', '2025-04-21', '14:00', '12:00', 1),
-(115, 5, '2025-04-17', '2025-04-19', '14:00', '12:00', 2),
-(116, 21, '2025-04-22', '2025-04-24', '14:00', '12:00', 4),
-(121, 14, '2025-04-20', '2025-04-23', '14:00', '12:00', 1),
-(122, 30, '2025-04-21', '2025-04-24', '14:00', '12:00', 1),
-(202, 2, '2025-04-21', '2025-04-24', '14:00', '12:00', 2),
-(203, 41, '2025-04-19', '2025-04-20', '14:00', '12:00', 4),
-(204, 26, '2025-04-17', '2025-04-20', '14:00', '12:00', 1),
-(205, 41, '2025-04-20', '2025-04-21', '14:00', '12:00', 2),
-(208, 41, '2025-04-19', '2025-04-22', '14:00', '12:00', 2),
-(216, 30, '2025-04-20', '2025-04-23', '14:00', '12:00', 2),
-(217, 13, '2025-04-19', '2025-04-22', '14:00', '12:00', 2),
-(219, 36, '2025-04-22', '2025-04-24', '14:00', '12:00', 1),
-(221, 16, '2025-04-18', '2025-04-20', '14:00', '12:00', 2),
-(222, 35, '2025-04-17', '2025-04-19', '14:00', '12:00', 2),
-(225, 27, '2025-04-18', '2025-04-19', '14:00', '12:00', 2),
-(228, 31, '2025-04-17', '2025-04-19', '14:00', '12:00', 4),
-(301, 35, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(302, 50, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(303, 46, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(304, 36, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(305, 32, '2025-04-25', '2025-04-27', '14:00', '12:00', 1),
-(306, 10, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(307, 29, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(308, 6, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(309, 19, '2025-04-25', '2025-04-27', '14:00', '12:00', 1),
-(310, 16, '2025-04-25', '2025-04-27', '14:00', '12:00', 1),
-(311, 31, '2025-04-25', '2025-04-27', '14:00', '12:00', 1),
-(312, 43, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(313, 4, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(314, 9, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(315, 13, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(316, 14, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(317, 41, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(318, 17, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(319, 30, '2025-04-25', '2025-04-27', '14:00', '12:00', 1),
-(320, 42, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(321, 2, '2025-04-25', '2025-04-27', '14:00', '12:00', 1),
-(322, 20, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(323, 11, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(324, 48, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(325, 27, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(326, 18, '2025-04-25', '2025-04-27', '14:00', '12:00', 4),
-(327, 22, '2025-04-25', '2025-04-27', '14:00', '12:00', 2),
-(328, 1, '2025-04-25', '2025-04-27', '14:00', '12:00', 2);
-
-
-Go
-
+GO
