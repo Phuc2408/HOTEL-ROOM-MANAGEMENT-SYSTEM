@@ -240,26 +240,33 @@ namespace HotelManagementApp.ViewModels
                 var service = sender as ServiceModel;
                 if (service == null) return;
 
-                // Lấy quantity gốc từ dictionary
+                // Lấy giá trị gốc (đã cộng dồn) từ dictionary, mặc định 0 nếu chưa có
                 int original = OriginalQuantities.TryGetValue(service.ServiceID, out var old) ? old : 0;
 
-                // Nếu quantity mới nhỏ hơn 0 thì reset về 0
-                if (service.Quantity < 0)
-                {
-                    service.Quantity = original; // rollback về số cũ
-                    return;
-                }
+                // Giá trị user mới nhập (có thể dương hoặc âm)
+                int inputValue = service.Quantity;
 
-                // Cộng dồn
-                service.Quantity += original;
+                // Tính newQuantity = original + inputValue (nếu inputValue âm => trừ bớt)
+                int newQuantity = original + inputValue;
 
-                // Cập nhật lại giá trị mới
-                OriginalQuantities[service.ServiceID] = service.Quantity;
+                // Nếu kết quả < 0 thì reset về 0
+                if (newQuantity < 0)
+                    newQuantity = 0;
 
-                // Tiếp tục xử lý
+                // Để tránh vòng lặp PropertyChanged, tạm unsubscribe rồi gán lại
+                service.PropertyChanged -= Service_PropertyChanged;
+                service.Quantity = newQuantity;
+                service.PropertyChanged += Service_PropertyChanged;
+
+                // Cập nhật lại giá trị cuối cùng vào dictionary
+                OriginalQuantities[service.ServiceID] = newQuantity;
+
+                // Đánh dấu service này để lưu chậm (saveDelayTimer)
                 lastChangedService = service;
                 saveDelayTimer.Stop();
                 saveDelayTimer.Start();
+
+                // Cập nhật lại danh sách lọc và tổng tiền
                 FilterServices();
                 CalculateTotalPrice();
             }
