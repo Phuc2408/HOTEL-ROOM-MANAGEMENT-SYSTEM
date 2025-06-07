@@ -99,5 +99,6 @@ namespace HotelManagementApp.Models
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        public bool IsReadOnly { get; set; } = false;
     }
 }

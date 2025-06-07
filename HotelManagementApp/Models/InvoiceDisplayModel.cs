@@ -9,6 +9,7 @@
         public string GuestName { get; set; }
         public string RentID { get; set; }
         public DateTime CheckOutDate { get; set; }
+        public DateTime InvoiceDate { get; set; }
         public decimal Total { get; set; }
     }
 }

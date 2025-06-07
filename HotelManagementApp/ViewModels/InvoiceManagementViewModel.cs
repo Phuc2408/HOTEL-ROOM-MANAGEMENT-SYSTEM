@@ -42,19 +42,20 @@ namespace HotelManagementApp.ViewModels
         private void LoadInvoicesFromDatabase()
         {
             var invoiceList = (from invoice in _context.Invoice
-                               join customer in _context.Customer on invoice.CID equals customer.CID
-                               join rent in _context.Rent on invoice.RelID equals rent.RelID
+                               join rent in _context.Rent on invoice.ReID equals rent.ReID
+                               join customer in _context.Customer on rent.CID equals customer.CID
                                join room in _context.Room on rent.RID equals room.RID
                                select new InvoiceDisplayModel
                                {
                                    IID = invoice.IID,
                                    InvoiceID = "INV" + invoice.IID.ToString("D3"),
                                    GuestName = customer.CName,
-                                   RentID = "RNT" + rent.RelID.ToString(),
+                                   RentID = "RNT" + rent.ReID.ToString(),
                                    CheckOutDate = rent.CheckOutDate,
                                    Total = invoice.Total,
                                    RoomType = room.RType,
-                                   RoomPrice = room.RPrice
+                                   RoomPrice = room.RPrice,
+                                   InvoiceDate = invoice.IDate // ✅ thêm dòng này
                                }).ToList();
 
             AllInvoices.Clear();

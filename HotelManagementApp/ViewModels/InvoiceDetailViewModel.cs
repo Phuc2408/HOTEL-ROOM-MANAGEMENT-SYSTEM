@@ -39,12 +39,12 @@ namespace HotelManagementApp.ViewModels
             var invoiceDb = _context.Invoice.FirstOrDefault(i => i.IID == invoiceId);
             if (invoiceDb == null) return;
 
-            var customer = _context.Customer.FirstOrDefault(c => c.CID == invoiceDb.CID);
-            var rent = _context.Rent.FirstOrDefault(r => r.RelID == invoiceDb.RelID);
+            var rent = _context.Rent.FirstOrDefault(r => r.ReID == invoiceDb.ReID);
+            var customer = rent != null ? _context.Customer.FirstOrDefault(c => c.CID == rent.CID) : null;
             var room = rent != null ? _context.Room.FirstOrDefault(r => r.RID == rent.RID) : null;
 
             var usages = _context.ServiceUsage
-                .Where(u => u.IID == invoiceDb.IID)
+                .Where(u => u.ReID == invoiceDb.ReID)
                 .ToList();
 
             var services = usages.Select(u =>
@@ -59,14 +59,30 @@ namespace HotelManagementApp.ViewModels
                 };
             }).ToList();
 
-            if (room != null)
+            // === Tính số ngày thuê ===
+            int numberOfDays = 1;
+            if (rent != null)
             {
+                numberOfDays = (invoiceDb.IDate.Date - rent.CheckInDate.Date).Days;
+                if (numberOfDays <= 0) numberOfDays = 1;
+
+                var delay = invoiceDb.IDate - (invoiceDb.IDate.Date + new TimeSpan(12, 0, 0));
+                if (delay.TotalHours > 6)
+                {
+                    numberOfDays += 1;
+                }
+            }
+
+            // === Dòng phí phòng tính đúng số ngày ===
+            if (room != null && numberOfDays > 0)
+            {
+                decimal unitPrice = invoiceDb.RoomTotal / numberOfDays;
                 var roomLine = new ServiceUsageViewModel
                 {
                     Name = $"Room Type: {room.RType}",
-                    Unit = "fixed",
-                    Price = room.RPrice,
-                    Quantity = 1
+                    Unit = "day",
+                    Price = unitPrice,
+                    Quantity = numberOfDays
                 };
                 services.Insert(0, roomLine);
             }

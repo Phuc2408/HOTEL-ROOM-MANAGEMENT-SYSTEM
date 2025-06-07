@@ -22,9 +22,9 @@ namespace HotelManagementApp.Helpers
                     SELECT DATEDIFF(DAY, r.CheckInDate, r.CheckOutDate) AS Days, rm.RPrice
                     FROM Rent r
                     JOIN Room rm ON r.RID = rm.RID
-                    WHERE r.RelID = @RelID";
+                    WHERE r.ReID = @ReID";
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@RelID", rentId);
+                cmd.Parameters.AddWithValue("@ReID", rentId);
 
                 conn.Open();
                 var reader = cmd.ExecuteReader();

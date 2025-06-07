@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelManagementApp.Models
 {
     public class ServiceUsage
     {
-        [Key] 
+        [Key]
         public int UID { get; set; }
+
         public int SID { get; set; }
-        public int CID { get; set; }
-        public int IID { get; set; }
+
+        public int ReID { get; set; } // ✅ đúng theo cột khóa ngoại trong DB
+
         public int Quantity { get; set; }
-        public decimal ServiceTotal { get; set; }
+
+        [Column("TotalPerService")]
+        public decimal ServiceTotal { get; set; } // ✅ đổi tên cho khớp DB hoặc map lại
     }
 }

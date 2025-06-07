@@ -98,10 +98,11 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                     BorderThickness="0"
-                                                     VerticalContentAlignment="Center"
-                                                     HorizontalContentAlignment="Left"
-                                                     TextAlignment="Left"/>
+         IsReadOnly="{Binding IsReadOnly}"
+         BorderThickness="0"
+         VerticalContentAlignment="Center"
+         HorizontalContentAlignment="Left"
+         TextAlignment="Left"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -146,11 +147,12 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                 BorderThickness="0"
-                                                 Background="Transparent"
-                                                 VerticalContentAlignment="Center"
-                                                 HorizontalContentAlignment="Left"
-                                                 TextAlignment="Left"/>
+         IsReadOnly="{Binding IsReadOnly}"
+         BorderThickness="0"
+         Background="Transparent"
+         VerticalContentAlignment="Center"
+         HorizontalContentAlignment="Left"
+         TextAlignment="Left"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
