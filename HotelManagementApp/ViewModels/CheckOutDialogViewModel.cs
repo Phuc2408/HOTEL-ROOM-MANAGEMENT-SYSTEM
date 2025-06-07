@@ -109,26 +109,57 @@ namespace HotelManagementApp.ViewModels
 
                 PeopleCount = currentActiveRent.NumberOfPeople;
                 CheckInDate = currentActiveRent.CheckInDate;
-                CheckOutDate = DateTime.Now;
+
+                // ===[ BẮT ĐẦU KHỐI LOGIC MỚI ]===
+                // Xử lý ngày check-out linh hoạt theo yêu cầu của bạn
 
                 DateTime now = DateTime.Now;
-                int numberOfDays = (now.Date - currentActiveRent.CheckInDate.Date).Days;
-                if (numberOfDays <= 0) numberOfDays = 1;
+                DateTime effectiveCheckoutDate; // Ngày checkout cuối cùng sẽ được dùng để tính toán
+                int extraHours = 0; // Số giờ trả trễ
 
-                TimeSpan defaultCheckoutTime = new TimeSpan(12, 0, 0);
-                DateTime expectedCheckout = now.Date + defaultCheckoutTime;
-                TimeSpan delay = now - expectedCheckout;
-
-                int extraHours = 0;
-                if (delay.TotalMinutes > 0)
+                // So sánh ngày giờ hiện tại với ngày checkout đã định trong hợp đồng
+                if (now < currentActiveRent.CheckOutDate)
                 {
-                    extraHours = (int)Math.Ceiling(delay.TotalHours);
-                    if (extraHours > 6)
+                    // TRƯỜNG HỢP 1: Khách trả phòng SỚM HƠN dự kiến
+                    // -> Lấy ngày checkout đã định làm mốc, không tính phí trả trễ
+                    effectiveCheckoutDate = currentActiveRent.CheckOutDate;
+                    extraHours = 0;
+                    Debug.WriteLine("Khách trả phòng sớm. Áp dụng ngày checkout đã định.");
+                }
+                else
+                {
+                    // TRƯỜNG HỢP 2: Khách trả phòng ĐÚNG HẠN hoặc TRỄ HƠN dự kiến
+                    // -> Lấy ngày giờ hiện tại làm mốc và tính phí trả trễ nếu có
+                    effectiveCheckoutDate = now;
+
+                    TimeSpan defaultCheckoutTime = new TimeSpan(12, 0, 0);
+                    DateTime expectedCheckoutToday = now.Date + defaultCheckoutTime;
+                    TimeSpan delay = now - expectedCheckoutToday;
+
+                    if (delay.TotalMinutes > 0)
                     {
-                        numberOfDays += 1;
-                        extraHours = 0;
+                        extraHours = (int)Math.Ceiling(delay.TotalHours);
+                        Debug.WriteLine($"Khách trả phòng trễ {extraHours} giờ.");
                     }
                 }
+
+                // Cập nhật ngày checkout hiển thị trên UI
+                CheckOutDate = effectiveCheckoutDate;
+
+                // Tính toán số ngày ở dựa trên ngày checkout hiệu lực
+                int numberOfDays = (effectiveCheckoutDate.Date - currentActiveRent.CheckInDate.Date).Days;
+                if (numberOfDays <= 0) numberOfDays = 1;
+
+                // Nếu trả trễ quá 6 tiếng, tính thêm 1 ngày và reset phí trả trễ
+                if (extraHours > 6)
+                {
+                    numberOfDays += 1;
+                    extraHours = 0;
+                    Debug.WriteLine("Trả trễ > 6 tiếng, tính thêm 1 ngày.");
+                }
+
+                // ===[ KẾT THÚC KHỐI LOGIC MỚI ]===
+
 
                 var invoiceRecord = db.Invoice.FirstOrDefault(i => i.ReID == activeReID_forCheckout);
                 if (invoiceRecord == null)
@@ -136,7 +167,7 @@ namespace HotelManagementApp.ViewModels
                     invoiceRecord = new Invoice
                     {
                         ReID = activeReID_forCheckout,
-                        IDate = now,
+                        IDate = effectiveCheckoutDate, // Dùng ngày hiệu lực
                         RoomTotal = roomPrice * numberOfDays,
                         ServiceTotal = 0,
                         Total = roomPrice * numberOfDays
@@ -146,7 +177,7 @@ namespace HotelManagementApp.ViewModels
                 else
                 {
                     invoiceRecord.RoomTotal = roomPrice * numberOfDays;
-                    invoiceRecord.IDate = now;
+                    invoiceRecord.IDate = effectiveCheckoutDate; // Dùng ngày hiệu lực
                     db.Invoice.Update(invoiceRecord);
                 }
 
@@ -168,7 +199,7 @@ namespace HotelManagementApp.ViewModels
                 Services.Insert(0, roomItemModel);
                 SaveOrUpdateServiceUsage(roomItemModel);
 
-                if (extraHours >= 0)
+                if (extraHours >= 0) // Chỉ cập nhật nếu có giờ trả trễ, nếu = 0 thì phải trả lại giá trị 0 để tính tiếp
                 {
                     var lateCheckout = Services.FirstOrDefault(s => s.ServiceName == "Late Checkout");
                     if (lateCheckout != null)
