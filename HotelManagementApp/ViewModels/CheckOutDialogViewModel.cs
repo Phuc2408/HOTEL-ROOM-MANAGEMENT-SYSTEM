@@ -8,11 +8,13 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
+using System.Data;
 
 namespace HotelManagementApp.ViewModels
 {
     public class CheckOutDialogViewModel : INotifyPropertyChanged
     {
+        #region Properties
         // ============================
         // 1. Các property hiển thị lên dialog
         // ============================
@@ -47,7 +49,7 @@ namespace HotelManagementApp.ViewModels
         private string roomType;
         private ServiceModel roomItemModel;
         private int activeReID_forCheckout;
-        private Dictionary<int, int> OriginalQuantities = new();
+        #endregion
 
         public CheckOutDialogViewModel()
         {
@@ -124,7 +126,7 @@ namespace HotelManagementApp.ViewModels
                     if (extraHours > 6)
                     {
                         numberOfDays += 1;
-                        extraHours = 0; // reset late checkout
+                        extraHours = 0;
                     }
                 }
 
@@ -175,7 +177,7 @@ namespace HotelManagementApp.ViewModels
                         SaveOrUpdateServiceUsage(lateCheckout);
                     }
                 }
-                
+
                 MarkSpecialServicesAsReadOnly();
                 if (CurrentInvoiceId != 0)
                 {
@@ -187,6 +189,32 @@ namespace HotelManagementApp.ViewModels
                 CanPerformCheckout = (activeReID_forCheckout != 0);
             }
         }
+
+        public void EvaluateAndSetQuantity(ServiceModel service, string expression)
+        {
+            if (service == null || string.IsNullOrWhiteSpace(expression)) return;
+
+            int finalQuantity;
+            try
+            {
+                var result = new DataTable().Compute(expression, null);
+                finalQuantity = Convert.ToInt32(result);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Lỗi tính toán biểu thức '{expression}': {ex.Message}");
+                using (var db = new AppDbContext())
+                {
+                    var existingUsage = db.ServiceUsage.FirstOrDefault(su => su.ReID == activeReID_forCheckout && su.SID == service.ServiceID);
+                    finalQuantity = existingUsage?.Quantity ?? 0;
+                }
+            }
+
+            if (finalQuantity < 0) finalQuantity = 0;
+
+            service.Quantity = finalQuantity;
+        }
+
 
         private void SaveDelayTimer_Tick(object sender, EventArgs e)
         {
@@ -240,33 +268,17 @@ namespace HotelManagementApp.ViewModels
                 var service = sender as ServiceModel;
                 if (service == null) return;
 
-                // Lấy giá trị gốc (đã cộng dồn) từ dictionary, mặc định 0 nếu chưa có
-                int original = OriginalQuantities.TryGetValue(service.ServiceID, out var old) ? old : 0;
+                if (service.Quantity < 0)
+                {
+                    service.PropertyChanged -= Service_PropertyChanged;
+                    service.Quantity = 0;
+                    service.PropertyChanged += Service_PropertyChanged;
+                }
 
-                // Giá trị user mới nhập (có thể dương hoặc âm)
-                int inputValue = service.Quantity;
-
-                // Tính newQuantity = original + inputValue (nếu inputValue âm => trừ bớt)
-                int newQuantity = original + inputValue;
-
-                // Nếu kết quả < 0 thì reset về 0
-                if (newQuantity < 0)
-                    newQuantity = 0;
-
-                // Để tránh vòng lặp PropertyChanged, tạm unsubscribe rồi gán lại
-                service.PropertyChanged -= Service_PropertyChanged;
-                service.Quantity = newQuantity;
-                service.PropertyChanged += Service_PropertyChanged;
-
-                // Cập nhật lại giá trị cuối cùng vào dictionary
-                OriginalQuantities[service.ServiceID] = newQuantity;
-
-                // Đánh dấu service này để lưu chậm (saveDelayTimer)
                 lastChangedService = service;
                 saveDelayTimer.Stop();
                 saveDelayTimer.Start();
 
-                // Cập nhật lại danh sách lọc và tổng tiền
                 FilterServices();
                 CalculateTotalPrice();
             }
@@ -356,9 +368,6 @@ namespace HotelManagementApp.ViewModels
             }
         }
 
-        // ============================
-        // 6. Định nghĩa bổ sung bị thiếu: SetRoomStatusToCleaning
-        // ============================
         public bool SetRoomStatusToCleaning()
         {
             if (this.CurrentRoomId == 0)

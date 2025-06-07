@@ -20,6 +20,7 @@ namespace HotelManagementApp.Views.Dialogs
             this.DataContext = vm;
         }
 
+        // ===[ SỬA 1 ]=== Cập nhật lại toàn bộ luồng xử lý của nút Confirm
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             var vm = this.DataContext as CheckOutDialogViewModel;
@@ -29,45 +30,72 @@ namespace HotelManagementApp.Views.Dialogs
                 return;
             }
 
-            // Chỉ thực hiện việc chuyển trạng thái phòng sang "Cleaning"
+            // Bước 1: Gọi phương thức chốt hóa đơn từ ViewModel.
+            // Phương thức này sẽ tính toán và cập nhật tiền phòng vào CSDL.
+            //bool billFinalized = vm.FinalizeBill();
+            //if (!billFinalized)
+            //{
+                // Nếu có lỗi, dừng lại. Thông báo lỗi đã được hiển thị bên trong ViewModel.
+                //return;
+            //}
+
+            // Bước 2: Sau khi chốt hóa đơn thành công, tiến hành đổi trạng thái phòng.
             bool statusUpdated = vm.SetRoomStatusToCleaning();
 
             if (statusUpdated)
             {
-                MessageBox.Show($"Trạng thái của phòng (ID: {vm.CurrentRoomId}) đã được cập nhật thành 'Cleaning'.",
-                                "Cập Nhật Thành Công",
+                MessageBox.Show($"Thanh toán thành công!\nTrạng thái của phòng (ID: {vm.CurrentRoomId}) đã được cập nhật thành 'Cleaning'.",
+                                "Thành Công",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Information);
 
-                this.DialogResult = true; // DialogResult có thể là true để báo hiệu hành động thành công
+                this.DialogResult = true;
                 this.Close();
             }
             else
             {
-                // Hiển thị thông báo lỗi nếu cập nhật không thành công
                 MessageBox.Show($"Không thể cập nhật trạng thái cho phòng (ID: {vm.CurrentRoomId}).\nVui lòng kiểm tra log hoặc thử lại.",
                                 "Lỗi Cập Nhật Trạng Thái",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
-                // Trong trường hợp lỗi, bạn có thể không đóng dialog để người dùng xem xét
-                // this.DialogResult = false; // Hoặc
-                // this.Close(); // Hoặc không đóng
             }
         }
+
+        // ===[ SỬA 2 ]=== Thêm logic xử lý cho sự kiện LostFocus
         private void QuantityTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            var tb = sender as TextBox;
-            var be = tb?.GetBindingExpression(TextBox.TextProperty);
-            be?.UpdateSource();
+            var textBox = sender as TextBox;
+            if (textBox == null) return;
+
+            // Lấy ServiceModel tương ứng với dòng hiện tại của TextBox
+            var service = textBox.DataContext as ServiceModel;
+            if (service == null) return;
+
+            // Lấy ViewModel chính của Dialog
+            var vm = this.DataContext as CheckOutDialogViewModel;
+            if (vm == null) return;
+
+            // Lấy biểu thức người dùng đã nhập
+            string expression = textBox.Text;
+
+            // Gọi phương thức trong ViewModel để xử lý tính toán
+            vm.EvaluateAndSetQuantity(service, expression);
+
+            // Vì UpdateSourceTrigger=Explicit, chúng ta phải tự cập nhật lại giao diện
+            // để TextBox hiển thị giá trị cuối cùng sau khi đã tính toán.
+            var binding = textBox.GetBindingExpression(TextBox.TextProperty);
+            binding?.UpdateTarget();
         }
+
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;
             this.Close();
         }
 
-        private void DataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // Có thể bỏ trống nếu không dùng
         }
     }
 }
