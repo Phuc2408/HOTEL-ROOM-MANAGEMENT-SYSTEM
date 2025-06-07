@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS HotelDB;
+﻿DROP DATABASE IF EXISTS HotelDB;
 GO
 
 CREATE DATABASE HotelDB;
@@ -17,8 +17,8 @@ DROP TABLE IF EXISTS Room;
 -- Bảng Room
 CREATE TABLE Room (
     RID INT PRIMARY KEY IDENTITY(1,1),
-    RType VARCHAR(50),
-    RStatus VARCHAR(20),
+    RType NVARCHAR(50),
+    RStatus NVARCHAR(20),
     RPrice DECIMAL(10,2),
     Rfloor INT
 );
@@ -26,11 +26,11 @@ CREATE TABLE Room (
 -- Bảng Customer
 CREATE TABLE Customer (
     CID INT PRIMARY KEY IDENTITY(1,1),
-    CName VARCHAR(100),
-    CPhone VARCHAR(20),
-    CPersonalID VARCHAR(20),
-    Cmail VARCHAR(100),
-    Ccountry VARCHAR(50)
+    CName NVARCHAR(100),
+    CPhone NVARCHAR(20),
+    CPersonalID NVARCHAR(20),
+    Cmail NVARCHAR(100),
+    Ccountry NVARCHAR(50)
 );
 
 -- Bảng Rent
@@ -51,8 +51,8 @@ CREATE TABLE Rent (
 -- Bảng Service
 CREATE TABLE Service (
     SID INT PRIMARY KEY IDENTITY(1,1),
-    SName VARCHAR(100),
-    SUnit VARCHAR(20),
+    SName NVARCHAR(100),
+    SUnit NVARCHAR(20),
     SPrice DECIMAL(10,2)
 );
 
@@ -307,22 +307,22 @@ INSERT INTO Customer (CName, CPhone, CPersonalID, CMail, CCountry) VALUES
 (N'Nguyễn Văn Bình', '0978248204', '700866211908', 'user53@gmail.com', 'Vietnam'),
 (N'Lê Văn Thành', '0986191942', '591913052169', 'user54@gmail.com', 'Vietnam');
 
-GO
+--Chèn dữ liệu bảng thuê phòng
 INSERT INTO Rent (RID, CID, CheckInDate, CheckOutDate, CheckInTime, CheckOutTime, NumberOfPeople, isDone)
 VALUES
 (101, 10, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (115, 5, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (116, 21, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
-(121, 14, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
+(121, 14, '2025-06-05', '2025-06-08', '14:00', '12:00', 2, 0),
 (122, 30, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
-(202, 2, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
+(202, 2, '2025-06-05', '2025-06-09', '14:00', '12:00', 2, 0),
 (203, 41, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (204, 26, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (205, 41, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
-(208, 41, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
+(208, 41, '2025-06-05', '2025-06-08', '14:00', '12:00', 2, 0),
 (216, 30, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (217, 13, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
-(219, 36, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
+(219, 36, '2025-06-05', '2025-06-09', '14:00', '12:00', 2, 0),
 (221, 16, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (222, 35, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (225, 27, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
@@ -355,4 +355,6 @@ VALUES
 (326, 18, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (327, 22, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0),
 (328, 1, '2025-06-05', '2025-06-07', '14:00', '12:00', 2, 0);
+
 Go
+
