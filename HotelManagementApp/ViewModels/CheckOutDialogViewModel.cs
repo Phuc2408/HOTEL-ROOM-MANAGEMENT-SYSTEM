@@ -150,12 +150,12 @@ namespace HotelManagementApp.ViewModels
                 int numberOfDays = (effectiveCheckoutDate.Date - currentActiveRent.CheckInDate.Date).Days;
                 if (numberOfDays <= 0) numberOfDays = 1;
 
-                // Nếu trả trễ quá 6 tiếng, tính thêm 1 ngày và reset phí trả trễ
+                // Nếu trả trễ quá 5 tiếng, tính thêm 1 ngày và reset phí trả trễ
                 if (extraHours > 6)
                 {
                     numberOfDays += 1;
                     extraHours = 0;
-                    Debug.WriteLine("Trả trễ > 6 tiếng, tính thêm 1 ngày.");
+                    Debug.WriteLine("Trả trễ > 5 tiếng, tính thêm 1 ngày.");
                 }
 
                 // ===[ KẾT THÚC KHỐI LOGIC MỚI ]===
