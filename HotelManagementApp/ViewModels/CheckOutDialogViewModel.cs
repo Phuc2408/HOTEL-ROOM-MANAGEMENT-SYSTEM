@@ -166,7 +166,7 @@ namespace HotelManagementApp.ViewModels
                 Services.Insert(0, roomItemModel);
                 SaveOrUpdateServiceUsage(roomItemModel);
 
-                if (extraHours > 0)
+                if (extraHours >= 0)
                 {
                     var lateCheckout = Services.FirstOrDefault(s => s.ServiceName == "Late Checkout");
                     if (lateCheckout != null)
@@ -175,7 +175,7 @@ namespace HotelManagementApp.ViewModels
                         SaveOrUpdateServiceUsage(lateCheckout);
                     }
                 }
-
+                
                 MarkSpecialServicesAsReadOnly();
                 if (CurrentInvoiceId != 0)
                 {
