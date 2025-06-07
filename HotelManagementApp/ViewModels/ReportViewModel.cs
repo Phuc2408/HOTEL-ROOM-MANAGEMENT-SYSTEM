@@ -409,27 +409,48 @@ namespace HotelManagementApp.ViewModels
         {
             using (var db = new AppDbContext())
             {
-                // Group theo SID, sum = tổng Quantity
+                // ===[ THÊM ]=== Bước 1: Lấy danh sách ID của các lượt thuê đã hoàn thành
+                var completedRentIds = db.Rent
+                    .Where(r => r.isDone == true)
+                    .Select(r => r.ReID)
+                    .ToList();
+
+                if (!completedRentIds.Any())
+                {
+                    // Nếu không có lượt thuê nào hoàn thành, xóa dữ liệu cũ và thoát
+                    ServiceUsageSeries.Clear();
+                    OnPropertyChanged(nameof(ServiceUsageSeries));
+                    return;
+                }
+
+                // ===[ SỬA ]=== Bước 2: Chỉ lấy ServiceUsage từ các lượt thuê đã hoàn thành
                 var usageData = db.ServiceUsage
+                    .Where(su => completedRentIds.Contains(su.ReID)) // Thêm điều kiện lọc ở đây
                     .GroupBy(su => su.SID)
                     .Select(g => new
                     {
                         SID = g.Key,
-                        TotalQty = g.Sum(x => x.Quantity)  // tổng số lần (Quantity) dùng dịch vụ
+                        TotalQty = g.Sum(x => x.Quantity)
                     })
                     .OrderByDescending(x => x.TotalQty)
                     .ToList();
 
+                // Lấy danh sách tên dịch vụ một lần để tối ưu
+                var serviceIds = usageData.Select(ud => ud.SID).ToList();
+                var services = db.Service
+                    .Where(s => serviceIds.Contains(s.SID))
+                    .ToDictionary(s => s.SID, s => s.SName);
+
                 ServiceUsageSeries.Clear();
 
                 // Lấy top 4
-                var top3 = usageData.Take(4).ToList();
+                var top4Data = usageData.Take(4).ToList();
                 double othersTotal = usageData.Skip(4).Sum(x => x.TotalQty);
 
-                foreach (var item in top3)
+                foreach (var item in top4Data)
                 {
-                    var svc = db.Service.FirstOrDefault(s => s.SID == item.SID);
-                    string serviceName = svc != null ? svc.SName : $"Service {item.SID}";
+                    // Lấy tên dịch vụ từ Dictionary đã tải sẵn
+                    string serviceName = services.TryGetValue(item.SID, out var name) ? name : $"Service {item.SID}";
 
                     ServiceUsageSeries.Add(new PieSeries
                     {
