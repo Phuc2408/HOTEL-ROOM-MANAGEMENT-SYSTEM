@@ -51,6 +51,23 @@ namespace HotelManagementApp.ViewModels
         private int activeReID_forCheckout;
         #endregion
 
+        // 1. Cho phép bật/tắt edit ô Check-Out
+        private bool _isCheckOutEditable;
+        public bool IsCheckOutEditable
+        {
+            get => _isCheckOutEditable;
+            set { _isCheckOutEditable = value; OnPropertyChanged(nameof(IsCheckOutEditable)); }
+        }
+
+        // 2. Lưu ngày cũ để rollback nếu user không pick
+        private DateTime? _oldCheckOutDate;
+        public DateTime? OldCheckOutDate
+        {
+            get => _oldCheckOutDate;
+            set { _oldCheckOutDate = value; OnPropertyChanged(nameof(OldCheckOutDate)); }
+        }
+
+
         public CheckOutDialogViewModel()
         {
             saveDelayTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(600) };
@@ -384,6 +401,20 @@ namespace HotelManagementApp.ViewModels
             TotalPrice = total;
         }
 
+        /// <summary>Rollback về ngày cũ và khóa control</summary>
+        public void CancelExtend()
+        {
+            CheckOutDate = OldCheckOutDate;
+            IsCheckOutEditable = false;
+        }
+
+        /// <summary>Xác nhận ngày mới và khóa control</summary>
+        public void ConfirmExtend(DateTime newDate)
+        {
+            UpdateExtendedDate(newDate);
+            IsCheckOutEditable = false;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -399,6 +430,52 @@ namespace HotelManagementApp.ViewModels
             }
         }
 
+        public void UpdateExtendedDate(DateTime newCheckoutDate)
+        {
+            if (!CheckInDate.HasValue) return;
+
+            // 1. Cập nhật hiển thị
+            CheckOutDate = newCheckoutDate;
+
+            // 2. Tính số ngày
+            int days = (newCheckoutDate.Date - CheckInDate.Value.Date).Days;
+            if (days < 1) days = 1;
+
+            // 3. Cập nhật quantity cho dòng phòng
+            if (roomItemModel != null)
+            {
+                roomItemModel.Quantity = days;
+                SaveOrUpdateServiceUsage(roomItemModel);
+            }
+
+            // 4. Cập nhật Rent và Invoice trong DB
+            using (var db = new AppDbContext())
+            {
+                // 4a. Cập nhật bảng Rent
+                var rent = db.Rent.FirstOrDefault(r => r.ReID == activeReID_forCheckout);
+                if (rent != null)
+                {
+                    rent.CheckOutDate = newCheckoutDate;
+                    // (nếu bạn muốn đánh dấu isDone tại extend thì cũng có thể set rent.isDone = true ở đây)
+                    db.Rent.Update(rent);
+                }
+
+                // 4b. Cập nhật bảng Invoice
+                var invoice = db.Invoice.FirstOrDefault(i => i.IID == CurrentInvoiceId);
+                if (invoice != null)
+                {
+                    //invoice.IDate = newCheckoutDate;
+                    invoice.RoomTotal = roomPrice * days;
+                    db.Invoice.Update(invoice);
+                }
+
+                db.SaveChanges();
+            }
+
+            // 5. Refresh UI
+            FilterServices();
+            CalculateTotalPrice();
+        }
         public bool SetRoomStatusToCleaning()
         {
             if (this.CurrentRoomId == 0)

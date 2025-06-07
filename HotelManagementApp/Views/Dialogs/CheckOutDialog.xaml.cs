@@ -1,7 +1,6 @@
-﻿using HotelManagementApp.Database;
-using HotelManagementApp.Models;
+﻿using HotelManagementApp.Models;
 using HotelManagementApp.ViewModels;
-using System.Linq;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,93 +8,113 @@ namespace HotelManagementApp.Views.Dialogs
 {
     public partial class CheckOutDialog : Window
     {
-        private RoomModel _room;
+        private readonly CheckOutDialogViewModel _vm;
+        private DateTime? _oldCheckOutDate;
+        private bool _isExtending;
+        private bool _dateChanged;
 
         public CheckOutDialog(RoomModel room)
         {
             InitializeComponent();
-
-            var vm = new CheckOutDialogViewModel();
-            vm.InitializeByRoomId(room.RID); // Chỉ dùng room.RID
-            this.DataContext = vm;
+            _vm = (CheckOutDialogViewModel)DataContext;
+            _vm.InitializeByRoomId(room.RID);
         }
 
-        // ===[ SỬA 1 ]=== Cập nhật lại toàn bộ luồng xử lý của nút Confirm
-        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        private void ExtendButton_Click(object sender, RoutedEventArgs e)
         {
-            var vm = this.DataContext as CheckOutDialogViewModel;
-            if (vm == null)
-            {
-                MessageBox.Show("Lỗi: Không tìm thấy ViewModel.", "Lỗi Hệ Thống", MessageBoxButton.OK, MessageBoxImage.Error);
+            // Lưu ngày cũ và bật mode extend
+            _oldCheckOutDate = _vm.CheckOutDate;
+            _vm.OldCheckOutDate = _oldCheckOutDate;
+            _isExtending = true;
+            _dateChanged = false;
+            _vm.IsCheckOutEditable = true;
+
+            // Chỉ pick ngày sau ngày cũ
+            dpCheckOut.DisplayDateStart = _oldCheckOutDate.Value.AddDays(1);
+
+            // Mở popup
+            dpCheckOut.IsDropDownOpen = true;
+            dpCheckOut.Focus();
+        }
+
+        private void dpCheckOut_CalendarOpened(object sender, RoutedEventArgs e)
+        {
+            // Khi mở ra, reset lại flag
+            _dateChanged = false;
+        }
+
+        private void dpCheckOut_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Chỉ set flag, không xử lý popup nào ở đây
+            if (_isExtending)
+                _dateChanged = true;
+        }
+
+        private void dpCheckOut_CalendarClosed(object sender, RoutedEventArgs e)
+        {
+            if (!_isExtending)
                 return;
-            }
 
-            // Bước 1: Gọi phương thức chốt hóa đơn từ ViewModel.
-            // Phương thức này sẽ tính toán và cập nhật tiền phòng vào CSDL.
-            //bool billFinalized = vm.FinalizeBill();
-            //if (!billFinalized)
-            //{
-                // Nếu có lỗi, dừng lại. Thông báo lỗi đã được hiển thị bên trong ViewModel.
-                //return;
-            //}
-
-            // Bước 2: Sau khi chốt hóa đơn thành công, tiến hành đổi trạng thái phòng.
-            bool statusUpdated = vm.SetRoomStatusToCleaning();
-
-            if (statusUpdated)
+            var newDate = dpCheckOut.SelectedDate;
+            // 1) Không chọn ngày hoặc chọn ngày không hợp lệ
+            if (!newDate.HasValue || newDate.Value <= _oldCheckOutDate.Value)
             {
-                MessageBox.Show($"Thanh toán thành công!\nTrạng thái của phòng (ID: {vm.CurrentRoomId}) đã được cập nhật thành 'Cleaning'.",
-                                "Thành Công",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Information);
+                MessageBox.Show(
+                    $"Bạn phải chọn ngày sau {_oldCheckOutDate:dd/MM/yyyy}.",
+                    "Ngày không hợp lệ",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
 
-                this.DialogResult = true;
-                this.Close();
+                // rollback và khóa lại
+                _vm.CancelExtend();
             }
             else
             {
-                MessageBox.Show($"Không thể cập nhật trạng thái cho phòng (ID: {vm.CurrentRoomId}).\nVui lòng kiểm tra log hoặc thử lại.",
-                                "Lỗi Cập Nhật Trạng Thái",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Error);
+                // 2) Ngày hợp lệ, hỏi xác nhận
+                var ans = MessageBox.Show(
+                    $"Bạn có chắc muốn gia hạn đến ngày {newDate:dd/MM/yyyy} không?",
+                    "Xác nhận gia hạn",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (ans == MessageBoxResult.Yes)
+                    _vm.ConfirmExtend(newDate.Value);
+                else
+                    _vm.CancelExtend();
             }
+
+            _isExtending = false;
         }
 
-        // ===[ SỬA 2 ]=== Thêm logic xử lý cho sự kiện LostFocus
+        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_vm.SetRoomStatusToCleaning())
+            {
+                MessageBox.Show(
+                    $"Không thể cập nhật trạng thái cho phòng (ID: {_vm.CurrentRoomId}).",
+                    "Lỗi",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
+            MessageBox.Show("Thanh toán thành công!", "Thành Công", MessageBoxButton.OK, MessageBoxImage.Information);
+            DialogResult = true;
+            Close();
+        }
+
         private void QuantityTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            var textBox = sender as TextBox;
-            if (textBox == null) return;
-
-            // Lấy ServiceModel tương ứng với dòng hiện tại của TextBox
-            var service = textBox.DataContext as ServiceModel;
-            if (service == null) return;
-
-            // Lấy ViewModel chính của Dialog
-            var vm = this.DataContext as CheckOutDialogViewModel;
-            if (vm == null) return;
-
-            // Lấy biểu thức người dùng đã nhập
-            string expression = textBox.Text;
-
-            // Gọi phương thức trong ViewModel để xử lý tính toán
-            vm.EvaluateAndSetQuantity(service, expression);
-
-            // Vì UpdateSourceTrigger=Explicit, chúng ta phải tự cập nhật lại giao diện
-            // để TextBox hiển thị giá trị cuối cùng sau khi đã tính toán.
-            var binding = textBox.GetBindingExpression(TextBox.TextProperty);
-            binding?.UpdateTarget();
+            if (sender is TextBox tb && tb.DataContext is ServiceModel svc)
+            {
+                _vm.EvaluateAndSetQuantity(svc, tb.Text);
+                tb.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
-            this.Close();
-        }
-
-        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // Có thể bỏ trống nếu không dùng
+            DialogResult = false;
+            Close();
         }
     }
 }
