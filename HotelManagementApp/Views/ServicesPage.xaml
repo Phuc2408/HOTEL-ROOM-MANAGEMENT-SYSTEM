@@ -39,31 +39,21 @@ FontSize="14">
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                <!-- 🔍 Search -->
-                <TextBox Width="200" Margin="0,0,10,0"
-         materialDesign:HintAssist.Hint="Search..."
-         VerticalAlignment="Center"/>
-
-                <!-- 🔽 Sort -->
-                <ComboBox Width="150" Margin="0,0,10,0"
-          VerticalAlignment="Center"
-          materialDesign:HintAssist.Hint="Sort">
-                    <ComboBoxItem Content="Newest"/>
-                    <ComboBoxItem Content="Oldest"/>
-                </ComboBox>
-
+                
 
                 <!-- Buttons -->
                 <Button x:Name="EditButton" 
-                        Style="{StaticResource SquareIconButtonStyle}" 
-                        Background="Transparent" 
-                        Foreground="#673AB7" 
-                        Margin="0,0,5,0" 
-                        Padding="8,3" 
-                        BorderThickness="0" 
-                        Click="EditButton_Click">
+        Style="{StaticResource SquareIconButtonStyle}" 
+        Background="Transparent" 
+        Foreground="#673AB7" 
+        Margin="0,0,5,0" 
+        Padding="8,3" 
+        BorderThickness="0" 
+        Command="{Binding EditCommand}">
+                    <!-- ✅ Dùng MVVM -->
                     <iconPacks:PackIconMaterial Kind="SquareEditOutline" Width="15" Height="15"/>
                 </Button>
+
                 <Button x:Name="DeleteButton" 
                         Style="{StaticResource SquareIconButtonStyle}" 
                         Background="Transparent" 
@@ -107,24 +97,9 @@ FontSize="14">
       SelectedItem="{Binding SelectedService, Mode=TwoWay}">
 
             <DataGrid.Columns>
-                <!-- Checkbox -->
-                <DataGridCheckBoxColumn Width="30" Header="" IsReadOnly="True">
-                    <DataGridCheckBoxColumn.ElementStyle>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridCheckBoxColumn.ElementStyle>
-                    <DataGridCheckBoxColumn.EditingElementStyle>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridCheckBoxColumn.EditingElementStyle>
-                </DataGridCheckBoxColumn>
-
-                <!-- service Name -->
-                <DataGridTextColumn Header="Service Name" Binding="{Binding SName}" Width="*">
+               
+                <!-- IDservice -->
+                <DataGridTextColumn Header="Service ID" Binding="{Binding SID}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextAlignment" Value="Left"/>
@@ -133,8 +108,8 @@ FontSize="14">
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- IDservice -->
-                <DataGridTextColumn Header="Service ID" Binding="{Binding SID}" Width="*">
+                <!-- service Name -->
+                <DataGridTextColumn Header="Service Name" Binding="{Binding SName}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextAlignment" Value="Left"/>

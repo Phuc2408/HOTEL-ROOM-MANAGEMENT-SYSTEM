@@ -39,27 +39,66 @@ namespace HotelManagementApp.ViewModels
             {
                 using (var context = new AppDbContext())
                 {
-                    var roomsFromDb = (from room in context.Room
-                                       join rent in context.Rent on room.RID equals rent.RID into rentGroup
-                                       from rent in rentGroup.DefaultIfEmpty()
-                                       join cust in context.Customer on rent.CID equals cust.CID into custGroup
-                                       from cust in custGroup.DefaultIfEmpty()
-                                       select new RoomModel
-                                       {
-                                           RID = room.RID,
-                                           RFloor = room.RFloor,
-                                           RType = room.RType,
-                                           RStatus = room.RStatus,
-                                           CName = cust.CName,
-                                           CheckInDate = rent.CheckInDate
-                                       }).ToList();
+                    // Giai đoạn 1: Lấy tất cả các phòng. Đối với mỗi phòng, nếu nó đang "Occupied" (hoặc "in_use"),
+                    // tìm bản ghi Rent được coi là "active" (isDone = false).
+                    var roomsAndPotentialRent = context.Room
+                        .Select(roomEntity => new // Tạo một đối tượng tạm cho mỗi roomEntity từ bảng Room
+                        {
+                            RoomData = roomEntity, // Thông tin cơ bản của phòng
+                                                   // Tìm bản ghi Rent "active" (isDone = false) cho phòng này.
+                                                   // Nếu có nhiều (không nên xảy ra cho phòng Occupied), lấy bản ghi có CheckInDate mới nhất.
+                            ActiveRentData = (roomEntity.RStatus == "in_use")
+                                ? context.Rent
+                                    .Where(rent => rent.RID == roomEntity.RID && rent.isDone == false) 
+                                    .OrderByDescending(rent => rent.CheckInDate)
+                                    .FirstOrDefault() // Lấy 1 hoặc null
+                                : null // Nếu phòng không Occupied/in_use, không có ActiveRentData
+                        })
+                        .ToList(); // Thực thi truy vấn, lấy danh sách các phòng và ActiveRentData (nếu có)
 
-                    Rooms = new ObservableCollection<RoomModel>(roomsFromDb);
+                    // Giai đoạn 2: Thu thập Customer ID từ các ActiveRentData (nếu có)
+                    var customerIdsToFetch = roomsAndPotentialRent
+                        .Where(rwp => rwp.ActiveRentData != null)
+                        .Select(rwp => rwp.ActiveRentData.CID)
+                        .Distinct()
+                        .ToList();
+
+                    // Giai đoạn 3: Lấy thông tin tất cả Customer cần thiết trong một lượt
+                    var customersDictionary = context.Customer
+                        .Where(c => customerIdsToFetch.Contains(c.CID))
+                        .ToDictionary(c => c.CID);
+
+                    // Giai đoạn 4: Tạo danh sách RoomModel cuối cùng để hiển thị
+                    var finalRoomModels = roomsAndPotentialRent.Select(temp =>
+                    {
+                        Customer customerData = null;
+                        if (temp.ActiveRentData != null && customersDictionary.TryGetValue(temp.ActiveRentData.CID, out var cust))
+                        {
+                            customerData = cust;
+                        }
+
+                        return new RoomModel
+                        {
+                            RID = temp.RoomData.RID,
+                            RFloor = temp.RoomData.RFloor,
+                            RType = temp.RoomData.RType,
+                            RStatus = temp.RoomData.RStatus,
+
+                            CName = (temp.RoomData.RStatus == "in_use") && customerData != null
+                                        ? customerData.CName
+                                        : null,
+                            CheckInDate = ((temp.RoomData.RStatus == "in_use") && temp.ActiveRentData != null)
+                                        ? temp.ActiveRentData.CheckInDate
+                                        : (DateTime?)null
+                        };
+                    }).ToList();
+
+                    Rooms = new ObservableCollection<RoomModel>(finalRoomModels);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi load RoomModel: {ex.Message}", "Lỗi dữ liệu");
+                MessageBox.Show($"Lỗi khi load RoomModel: {ex.Message}\n{ex.StackTrace}", "Lỗi dữ liệu");
                 Rooms = new ObservableCollection<RoomModel>();
             }
 

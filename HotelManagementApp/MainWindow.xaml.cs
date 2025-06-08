@@ -102,5 +102,6 @@ namespace HotelManagementApp
                 MessageBox.Show("Lỗi khi kết nối hoặc thực thi SQL:\n" + ex.Message);
             }
         }
+
     }
 }

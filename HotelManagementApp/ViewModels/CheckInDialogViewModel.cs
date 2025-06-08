@@ -62,6 +62,13 @@ namespace HotelManagementApp.ViewModels
             set => SetProperty(ref _checkOutDate, value);
         }
 
+        public int RoomIdInt => int.TryParse(RoomId, out int r) ? r : 0;
+        public int PeopleCountInt => int.TryParse(PeopleCount, out int p) ? p : 1;
+        public DateTime CheckInDateValue => CheckInDate ?? DateTime.Today;
+        public DateTime CheckOutDateValue => CheckOutDate ?? DateTime.Today.AddDays(1);
+
+        public bool IsRepairRequested { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -72,17 +79,6 @@ namespace HotelManagementApp.ViewModels
             storage = value;
             OnPropertyChanged(propertyName);
             return true;
-        }
-
-        public CheckInDialogViewModel()
-        {
-            // No need for countries list anymore
-        }
-        private bool _isRepairRequested;
-        public bool IsRepairRequested
-        {
-            get => _isRepairRequested;
-            set => SetProperty(ref _isRepairRequested, value);
         }
     }
 }

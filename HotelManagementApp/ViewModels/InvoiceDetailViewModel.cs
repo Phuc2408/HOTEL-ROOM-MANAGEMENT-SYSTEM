@@ -4,7 +4,6 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
 
 namespace HotelManagementApp.ViewModels
 {
@@ -24,7 +23,7 @@ namespace HotelManagementApp.ViewModels
             }
         }
 
-        public decimal TotalAmount => Invoice?.Total ?? 0;
+        public decimal TotalAmount => Invoice?.Services?.Sum(s => s.Quantity * s.Price) ?? 0;
 
         public InvoiceDetailViewModel(Invoice invoice)
         {
@@ -40,11 +39,12 @@ namespace HotelManagementApp.ViewModels
             var invoiceDb = _context.Invoice.FirstOrDefault(i => i.IID == invoiceId);
             if (invoiceDb == null) return;
 
-            var customer = _context.Customer.FirstOrDefault(c => c.CID == invoiceDb.CID);
-            var rent = _context.Rent.FirstOrDefault(r => r.RelID == invoiceDb.RelID);
+            var rent = _context.Rent.FirstOrDefault(r => r.ReID == invoiceDb.ReID);
+            var customer = rent != null ? _context.Customer.FirstOrDefault(c => c.CID == rent.CID) : null;
+            var room = rent != null ? _context.Room.FirstOrDefault(r => r.RID == rent.RID) : null;
 
             var usages = _context.ServiceUsage
-                .Where(u => u.IID == invoiceDb.IID)
+                .Where(u => u.ReID == invoiceDb.ReID)
                 .ToList();
 
             var services = usages.Select(u =>
@@ -58,6 +58,34 @@ namespace HotelManagementApp.ViewModels
                     Quantity = u.Quantity
                 };
             }).ToList();
+
+            // === Tính số ngày thuê ===
+            int numberOfDays = 1;
+            if (rent != null)
+            {
+                numberOfDays = (invoiceDb.IDate.Date - rent.CheckInDate.Date).Days;
+                if (numberOfDays <= 0) numberOfDays = 1;
+
+                var delay = invoiceDb.IDate - (invoiceDb.IDate.Date + new TimeSpan(12, 0, 0));
+                if (delay.TotalHours > 6)
+                {
+                    numberOfDays += 1;
+                }
+            }
+
+            // === Dòng phí phòng tính đúng số ngày ===
+            if (room != null && numberOfDays > 0)
+            {
+                decimal unitPrice = invoiceDb.RoomTotal / numberOfDays;
+                var roomLine = new ServiceUsageViewModel
+                {
+                    Name = $"Room Type: {room.RType}",
+                    Unit = "day",
+                    Price = unitPrice,
+                    Quantity = numberOfDays
+                };
+                services.Insert(0, roomLine);
+            }
 
             Invoice = new InvoiceViewModel
             {
@@ -82,6 +110,7 @@ namespace HotelManagementApp.ViewModels
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

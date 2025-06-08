@@ -3,7 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" 
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:Icon="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.Material" 
       xmlns:local="clr-namespace:HotelManagementApp.ViewModels"
       Title="Guest Management"
       Background="White"
@@ -11,7 +10,6 @@
       FontSize="14">
 
     <Page.DataContext>
-        <!-- Binding với ViewModel -->
         <local:GuestManagementViewModel />
     </Page.DataContext>
 
@@ -26,12 +24,12 @@
 
         <!-- Title -->
         <TextBlock Grid.Row="1"
-       Text="Guest Management"
-       FontSize="24"
-       FontWeight="Bold"
-       Foreground="#673AB7"
-       Margin="20,10,0,20"
-       VerticalAlignment="Center"/>
+                   Text="Guest Management"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Foreground="#673AB7"
+                   Margin="20,10,0,20"
+                   VerticalAlignment="Center"/>
 
         <!-- Toolbar -->
         <Grid Grid.Row="2" Margin="0,0,0,10">
@@ -44,147 +42,49 @@
                 <!-- 🔍 Search -->
                 <TextBox Width="200" Margin="0,0,10,0"
                          materialDesign:HintAssist.Hint="Search..."
-                         VerticalAlignment="Center"/>
+                         VerticalAlignment="Center"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <!-- 🔽 Sort -->
-                <ComboBox Width="150" Margin="0,0,10,0"
-                          VerticalAlignment="Center"
-                          materialDesign:HintAssist.Hint="Sort">
-                    <ComboBoxItem Content="Newest"/>
-                    <ComboBoxItem Content="Oldest"/>
-                </ComboBox>
+                
 
-
-                <!-- Buttons -->
-                <Button x:Name="EditButton" 
-         Style="{StaticResource SquareIconButtonStyle}" 
-         Background="Transparent" 
-         Foreground="#673AB7" 
-         Margin="0,0,5,0" 
-         Padding="8,3" 
-         BorderThickness="0" 
-         Click="EditButton_Click">
-                    <iconPacks:PackIconMaterial Kind="SquareEditOutline" Width="15" Height="15"/>
-                </Button>
-                <Button x:Name="DeleteButton" 
-         Style="{StaticResource SquareIconButtonStyle}" 
-         Background="Transparent" 
-         Foreground="red" 
-         Margin="0,0,5,0" 
-         Padding="8,3" 
-         BorderThickness="0" 
-         Command="{Binding DeleteCommand}">
-                    <iconPacks:PackIconMaterial Kind="DeleteOutline" Width="15" Height="15"/>
-                </Button>
+           
             </StackPanel>
         </Grid>
 
         <!-- DataGrid -->
         <DataGrid x:Name="GuestDataGrid"
-          Grid.Row="3"
-          AutoGenerateColumns="False"
+                  Grid.Row="3"
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding Guests}"
+                  SelectedItem="{Binding SelectedGuest, Mode=TwoWay}"
                   VerticalScrollBarVisibility="Auto"
-          HorizontalScrollBarVisibility="Auto"
-          IsReadOnly="True"
-          CanUserAddRows="False"
-          SelectionMode="Single"
-          Margin="10,0,0,10"
-          RowHeight="36"
-          GridLinesVisibility="Horizontal"
-          VerticalAlignment="Top"
-          Background="White"
-          BorderThickness="0"
-          ItemsSource="{Binding Guests}"
-          SelectedItem="{Binding SelectedGuest, Mode=TwoWay}">
+                  HorizontalScrollBarVisibility="Auto"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  SelectionMode="Single"
+                  Margin="10,0,0,10"
+                  RowHeight="36"
+                  GridLinesVisibility="Horizontal"
+                  VerticalAlignment="Top"
+                  Background="White"
+                  BorderThickness="0">
 
             <DataGrid.Columns>
-                <!-- Checkbox -->
-                <DataGridCheckBoxColumn Width="30" Header="" IsReadOnly="True">
-                    <DataGridCheckBoxColumn.ElementStyle>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridCheckBoxColumn.ElementStyle>
-                    <DataGridCheckBoxColumn.EditingElementStyle>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridCheckBoxColumn.EditingElementStyle>
-                </DataGridCheckBoxColumn>
+                <DataGridTextColumn Header="Guest Name" Binding="{Binding GuestName}" Width="*"/>
+                <DataGridTextColumn Header="ID Card" Binding="{Binding IdCard}" Width="*"/>
+                <DataGridTextColumn Header="Phone Number" Binding="{Binding PhoneNumber}" Width="*"/>
+                <DataGridTextColumn Header="Check In Date" Binding="{Binding CheckInDate, StringFormat='dd/MM/yyyy'}" Width="*"/>
 
-                <!-- Guest Name -->
-                <DataGridTextColumn Header="Guest Name" Binding="{Binding GuestName}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- ID Card -->
-                <DataGridTextColumn Header="ID Card" Binding="{Binding IdCard}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Phone Number -->
-                <DataGridTextColumn Header="Phone Number" Binding="{Binding PhoneNumber}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Email -->
-                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Check In Date -->
-                <DataGridTextColumn Header="Check In Date" Binding="{Binding CheckInDate, StringFormat='dd/MM/yyyy'}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="TextAlignment" Value="Left"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Status -->
                 <DataGridTemplateColumn Header="Room" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Background="{Binding StatusColor}" CornerRadius="5" Padding="4" HorizontalAlignment="Left">
-                                <TextBlock Text="{Binding Room}"
-                               FontSize="13"
-                               FontWeight="Normal"
-                               Foreground="White"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding Room}" FontSize="13" Foreground="White"/>
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
-
         </DataGrid>
-
-
-
-
     </Grid>
 </Page>
