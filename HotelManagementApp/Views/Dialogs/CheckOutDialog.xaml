@@ -1,0 +1,211 @@
+﻿<Window x:Class="HotelManagementApp.Views.Dialogs.CheckOutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:HotelManagementApp.ViewModels"
+        Title="Check Out" Height="600" Width="700"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <vm:CheckOutDialogViewModel />
+    </Window.DataContext>
+
+    <Border Background="Transparent" CornerRadius="12" Padding="20">
+        <Grid>
+            <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryDark">
+                <!-- Tab Check-out -->
+                <TabItem Header="Check-out">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Thông tin khách & ngày -->
+                        <Grid Grid.Row="1" Margin="0,0,0,10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Row="0" Grid.Column="0" Margin="5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     materialDesign:HintAssist.Hint="Guest name"
+                                     IsReadOnly="True"
+                                     Text="{Binding GuestName}" />
+                            <TextBox Grid.Row="0" Grid.Column="1" Margin="5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     materialDesign:HintAssist.Hint="ID Card"
+                                     IsReadOnly="True"
+                                     Text="{Binding IdCard}" />
+                            <TextBox Grid.Row="1" Grid.Column="0" Margin="5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     materialDesign:HintAssist.Hint="Phone number"
+                                     IsReadOnly="True"
+                                     Text="{Binding PhoneNumber}" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Margin="5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     materialDesign:HintAssist.Hint="Country"
+                                     IsReadOnly="True"
+                                     Text="{Binding SelectedCountry}" />
+                            <TextBox Grid.Row="2" Grid.Column="0" Margin="5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     materialDesign:HintAssist.Hint="Room"
+                                     IsReadOnly="True"
+                                     Text="{Binding RoomNumber}" />
+                            <TextBox Grid.Row="2" Grid.Column="1" Margin="5"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     materialDesign:HintAssist.Hint="Number of people"
+                                     IsReadOnly="True"
+                                     Text="{Binding PeopleCount}" />
+
+                            <!-- Check In -->
+                            <DatePicker Grid.Row="3" Grid.Column="0" Margin="5"
+                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                        materialDesign:HintAssist.Hint="Check In"
+                                        IsEnabled="False"
+                                        SelectedDate="{Binding CheckInDate}" />
+
+                            <!-- Check Out (extendable) -->
+                            <DatePicker x:Name="dpCheckOut"
+                                        Grid.Row="3" Grid.Column="1" Margin="5"
+                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                        materialDesign:HintAssist.Hint="Check Out"
+                                        IsEnabled="{Binding IsCheckOutEditable}"
+                                        SelectedDate="{Binding CheckOutDate, Mode=TwoWay}"
+                                        CalendarOpened="dpCheckOut_CalendarOpened"
+                                        CalendarClosed="dpCheckOut_CalendarClosed">
+                                <DatePicker.Resources>
+                                    <!-- Chặn gõ tay, chỉ pick calendar -->
+                                    <Style TargetType="DatePickerTextBox">
+                                        <Setter Property="IsReadOnly" Value="True"/>
+                                    </Style>
+                                </DatePicker.Resources>
+                            </DatePicker>
+                        </Grid>
+
+                        <!-- Bảng dịch vụ -->
+                        <DataGrid Grid.Row="2"
+                                  ItemsSource="{Binding FilteredServices}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="False"
+                                  Margin="0,10,0,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Service"
+                                                    Binding="{Binding ServiceName}"
+                                                    Width="*"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Unit"
+                                                    Binding="{Binding Unit}"
+                                                    Width="*"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Unit Price"
+                                                    Binding="{Binding UnitPrice, StringFormat=N0}"
+                                                    Width="*"
+                                                    IsReadOnly="True" />
+                                <DataGridTemplateColumn Header="Quantity" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox VerticalContentAlignment="Center"
+                                                     TextAlignment="Left"
+                                                     BorderThickness="0"
+                                                     IsReadOnly="{Binding IsReadOnly}"
+                                                     Text="{Binding Quantity, UpdateSourceTrigger=Explicit}"
+                                                     LostFocus="QuantityTextBox_LostFocus"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Price"
+                                                    Binding="{Binding TotalAmount, StringFormat=N0}"
+                                                    Width="*"
+                                                    IsReadOnly="True" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Tổng tiền -->
+                        <TextBlock Grid.Row="2"
+                                   Text="{Binding TotalPrice, StringFormat=Total: {0:N0} VND}"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Foreground="#2E86C1"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Bottom"
+                                   Margin="0,0,10,0"/>
+
+                        <!-- Nút Extend / Confirm / Cancel -->
+                        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Extend"
+                                    Margin="5"
+                                    Width="100"
+                                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    Click="ExtendButton_Click" />
+                            <Button Content="Confirm"
+                                    Margin="5"
+                                    Width="100"
+                                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    IsEnabled="{Binding CanPerformCheckout}"
+                                    Click="ConfirmButton_Click" />
+                            <Button Content="Cancel"
+                                    Margin="5"
+                                    Width="100"
+                                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    Click="CancelButton_Click" />
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+
+                <!-- Tab Service (giữ nguyên) -->
+                <TabItem Header="Service">
+                    <DataGrid ItemsSource="{Binding Services}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="False"
+                              Margin="5"
+                              SelectionUnit="Cell">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Service"
+                                                Binding="{Binding ServiceName}"
+                                                Width="*"
+                                                IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Unit"
+                                                Binding="{Binding Unit}"
+                                                Width="*"
+                                                IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Unit Price"
+                                                Binding="{Binding UnitPrice, StringFormat=N0}"
+                                                Width="*"
+                                                IsReadOnly="True"/>
+
+                            <DataGridTemplateColumn Header="Quantity" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox VerticalContentAlignment="Center"
+                                                 TextAlignment="Left"
+                                                 BorderThickness="0"
+                                                 Background="Transparent"
+                                                 IsReadOnly="{Binding IsReadOnly}"
+                                                 Text="{Binding Quantity, UpdateSourceTrigger=Explicit}"
+                                                 LostFocus="QuantityTextBox_LostFocus"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn Header="Price"
+                                                Binding="{Binding TotalAmount, StringFormat=N0}"
+                                                Width="*"
+                                                IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Border>
+</Window>
